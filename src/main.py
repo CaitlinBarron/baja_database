@@ -6,12 +6,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 def main():
     print("Hello World!")
-    book = spreadsheet_init()
+    book = spreadsheetInit()
     print(book.worksheets())
     gui()
 
 
-def spreadsheet_init():
+def spreadsheetInit():
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
 
@@ -24,12 +24,27 @@ def spreadsheet_init():
 
 
 def gui():
-    window = Tk()
-    window.title("RIT Baja Database")
-    window.geometry('350x200')
-    openbtn = Button(window, text="Open File")
-    openbtn.grid(column=0, row=0)
-    window.mainloop()
+    global root
+    root = Tk()
+    root.title("RIT Baja Database")
+    root.configure(bg="#FDAC44")
+    addBtn = Button(root, text="Add Data", width="15", height="2",
+                    bg="#FFFFFF", font=("Arial", "10", "bold"), command=lambda: addData())
+    addBtn.grid(column=0, row=0, padx=20, pady=30)
+    viewBtn = Button(root, text="View or Edit Data", width="17", height="2",
+                    bg="#FFFFFF", font=("Arial", "10", "bold"), command=lambda: viewData())
+    viewBtn.grid(column=1, row=0, padx=20, pady=30)
+    root.mainloop()
+
+
+def addData():
+    dialog = Toplevel()
+    #fix this?
+    dialog.wait_window(root)
+
+
+def viewData():
+    dialog = Toplevel()
 
 
 class Datafile:
@@ -48,3 +63,4 @@ class Datafile:
 
 if __name__ == "__main__":
     main()
+
