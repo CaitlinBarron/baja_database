@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, scrolledtext
 import gspread
 import datetime
 from oauth2client.service_account import ServiceAccountCredentials
@@ -120,54 +120,56 @@ def addDataWindow():
     subwidth=15
     subLbl = Label(dialog, text="Subsystem",
                         bg="#FDAC44", width=collecteewidth)
-    subLbl.grid(column=4, row=0, padx=xpad, pady=ypad)
+    subLbl.grid(column=0, row=4, padx=xpad, pady=ypad)
     subSel = ttk.Combobox(dialog, width=collecteewidth,
                         values=["Frame", "Suspension", "Steering", "Outboard", "Brakes",
                         "Ergonomics", "Reduction", "CVT", "Electrical", "R&D",
                         "Manufacturing", "Engine", "Composites", "Driveline Integration",
                         "Eboard", "Other"])
-    subSel.grid(column=4, row=1, padx=xpad, pady=ypad)
+    subSel.grid(column=0, row=5, padx=xpad, pady=ypad)
 
     projwidth=20
     projectLbl = Label(dialog, text="Project Name",
                          bg="#FDAC44", width=projwidth)
-    projectLbl.grid(column=5, row=0, padx=xpad, pady=ypad)
+    projectLbl.grid(column=1, row=4, padx=xpad, pady=ypad)
     projectEntry = Entry(dialog, width=projwidth, bg="#FFFFFF")
-    projectEntry.grid(column=5, row=1, padx=xpad, pady=ypad)
+    projectEntry.grid(column=1, row=5, padx=xpad, pady=ypad)
 
     tagswidth = 30
     tagsLbl = Label(dialog, text="Tags (separate with commas)",
                        bg="#FDAC44", width=tagswidth)
-    tagsLbl.grid(column=6, row=0, padx=xpad, pady=ypad)
+    tagsLbl.grid(column=2, row=4, columnspan=2, padx=xpad, pady=ypad)
     tagsEntry = Entry(dialog, width=tagswidth, bg="#FFFFFF")
-    tagsEntry.grid(column=6, row=1, padx=xpad, pady=ypad)
+    tagsEntry.grid(column=2, row=5, columnspan=2, padx=xpad, pady=ypad)
 
-    descwidth = 40
+    descwidth = 45
     descLbl = Label(dialog, text="Data Description",
                     bg="#FDAC44", width=descwidth)
-    descLbl.grid(column=7, row=0, padx=xpad, pady=ypad)
-    descEntry = Entry(dialog, width=descwidth, bg="#FFFFFF")
-    descEntry.grid(column=7, row=1, padx=xpad, pady=ypad)
+    descLbl.grid(column=0, row=7, columnspan=2, padx=xpad, pady=ypad)
+    descEntry = scrolledtext.ScrolledText(dialog, height=3, width=descwidth, bg="#FFFFFF")
+    descEntry.grid(column=0, row=8, columnspan=2, rowspan=2, padx=xpad, pady=ypad)
 
     filewidth = 30
     fileLbl = Label(dialog, text="Data File",
                     bg="#FDAC44", width=filewidth)
-    fileLbl.grid(column=8, row=0, padx=xpad, pady=ypad)
+    fileLbl.grid(column=2, row=7, columnspan=2, padx=xpad, pady=ypad)
     fileNameLbl = Label(dialog, text=newData.file,
                     bg="#FFFFFF", width=filewidth)
-    fileNameLbl.grid(column=8, row=1, padx=xpad, pady=ypad)
+    fileNameLbl.grid(column=2, row=8, columnspan=2, padx=xpad, pady=ypad)
     fileBtn = Button(dialog, text="Attach File", bg="#FFFFFF", width=int((filewidth/2)),
                      command=lambda: fileSel(fileNameLbl))
-    fileBtn.grid(column=8, row=2, padx=xpad, pady=ypad)
+    fileBtn.grid(column=2, row=9, columnspan=2, padx=xpad, pady=ypad)
 
 
     submitBtn = Button(dialog, text="Submit Data", width=15,
                        command=lambda: addData(newData, nameEntry, selDateLbl, carEntry,
                                                collecteeEntry, subSel, projectEntry,
                                                tagsEntry, descEntry, fileNameLbl))
-    submitBtn.grid(column=5, row=3, padx=xpad, pady=ypad)
+    submitBtn.grid(column=5, row=5, padx=xpad, pady=ypad)
 
-    #dialog.mainloop()
+    dialog.grid_rowconfigure(3, minsize=20)
+    dialog.grid_rowconfigure(6, minsize=20)
+    dialog.grid_columnconfigure(4, minsize=30)
 
 
 def viewDataWindow():
