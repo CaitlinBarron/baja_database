@@ -1,18 +1,21 @@
 from tkinter import *
 from tkinter import ttk, filedialog, scrolledtext
-import gspread
+#import gspread
+#from oauth2client.service_account import ServiceAccountCredentials
 import datetime
-from oauth2client.service_account import ServiceAccountCredentials
 from calendarWidget import Calendar
+import sqlite3
+import uuid
 
 
 def main():
-    print("Hello World!")
-    book = spreadsheetInit()
-    print(book.worksheets())
+    conn = databaseInit()
+    print("database opened successfully!")
+    #book = spreadsheetInit()
+    #print(book.worksheets())
     gui()
 
-
+"""
 def spreadsheetInit():
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
@@ -23,6 +26,16 @@ def spreadsheetInit():
 
     book = gc.open_by_url("https://docs.google.com/spreadsheets/d/1Yir91DAk2HuJkvjuCnPcn7gAq5UpBjIqTXoel6G6n5A/edit#gid=0")
     return book
+"""
+
+
+def databaseInit():
+    #C:\Users\Caitlin\Documents\repositories\personal code\baja_database\src\baja_data.db
+    conn = sqlite3.connect('baja_data.db')
+    curse = conn.cursor()
+    #curse.execute("CREATE TABLE IF NOT EXISTS baja_data_details()")
+
+    return conn
 
 
 class Datafile:
@@ -76,6 +89,23 @@ def addData(newData, nameEntry, selDateLbl, carEntry, collecteeEntry, subSel, pr
     newData.tags = tagsEntry.get().split
     newData.description = descEntry.get()
     newData.file = fileNameLbl.cget("text")
+
+    """
+    saved = 0
+    while (saved != 1)
+        ID = str(uuid.uuid4()).replace('-','')
+        cursor.execute("SELECT * FROM baja_data_details WHERE DataID = ?", (ID,))
+        if len(data) == 0
+            #save new data into baja_data_details
+            saved = 1
+        else
+            #make new id
+            pass
+    """
+
+
+def searchData(dialog):
+    pass
 
 
 def addDataWindow():
@@ -142,23 +172,23 @@ def addDataWindow():
     tagsEntry = Entry(dialog, width=tagswidth, bg="#FFFFFF")
     tagsEntry.grid(column=2, row=5, columnspan=2, padx=xpad, pady=ypad)
 
-    descwidth = 45
+    descwidth = 60
     descLbl = Label(dialog, text="Data Description",
                     bg="#FDAC44", width=descwidth)
-    descLbl.grid(column=0, row=7, columnspan=2, padx=xpad, pady=ypad)
-    descEntry = scrolledtext.ScrolledText(dialog, height=3, width=descwidth, bg="#FFFFFF")
-    descEntry.grid(column=0, row=8, columnspan=2, rowspan=2, padx=xpad, pady=ypad)
+    descLbl.grid(column=0, row=7, columnspan=4, padx=xpad, pady=ypad)
+    descEntry = scrolledtext.ScrolledText(dialog, height=2, width=descwidth, bg="#FFFFFF")
+    descEntry.grid(column=0, row=8, columnspan=4, rowspan=2, padx=xpad, pady=ypad)
 
-    filewidth = 30
+    filewidth = 70
     fileLbl = Label(dialog, text="Data File",
                     bg="#FDAC44", width=filewidth)
-    fileLbl.grid(column=2, row=7, columnspan=2, padx=xpad, pady=ypad)
+    fileLbl.grid(column=0, row=10, columnspan=4, padx=xpad, pady=ypad)
     fileNameLbl = Label(dialog, text=newData.file,
                     bg="#FFFFFF", width=filewidth)
-    fileNameLbl.grid(column=2, row=8, columnspan=2, padx=xpad, pady=ypad)
-    fileBtn = Button(dialog, text="Attach File", bg="#FFFFFF", width=int((filewidth/2)),
+    fileNameLbl.grid(column=0, row=11, columnspan=4, padx=xpad, pady=ypad)
+    fileBtn = Button(dialog, text="Attach File", bg="#FFFFFF", width=int((filewidth/3)),
                      command=lambda: fileSel(fileNameLbl))
-    fileBtn.grid(column=2, row=9, columnspan=2, padx=xpad, pady=ypad)
+    fileBtn.grid(column=0, row=12, columnspan=4, padx=xpad, pady=ypad)
 
 
     submitBtn = Button(dialog, text="Submit Data", width=15,
@@ -167,13 +197,75 @@ def addDataWindow():
                                                tagsEntry, descEntry, fileNameLbl))
     submitBtn.grid(column=5, row=5, padx=xpad, pady=ypad)
 
-    dialog.grid_rowconfigure(3, minsize=20)
-    dialog.grid_rowconfigure(6, minsize=20)
-    dialog.grid_columnconfigure(4, minsize=30)
+    rowSpace = 40
+    colSpace = 30
+    dialog.grid_rowconfigure(3, minsize=rowSpace)
+    dialog.grid_rowconfigure(6, minsize=rowSpace)
+    dialog.grid_rowconfigure(9, minsize=(rowSpace*2))
+    dialog.grid_columnconfigure(4, minsize=colSpace)
 
 
 def viewDataWindow():
     dialog = Toplevel(root)
+    dialog.configure(bg="#FDAC44")
+    dialog.resizable(width=0, height=0)
+    xpad = 5
+    ypad = 5
+
+    searchBtn = Button(dialog, text="Search Data", width=20,
+                        command=lambda: searchData(dialog))
+    searchBtn.grid(column=1, row=0, padx=xpad, pady=ypad)
+
+    dialog.grid_columnconfigure(0, minsize=30)
+    dialog.grid_columnconfigure(2, minsize=30)
+
+    frame = Frame(dialog)
+    frame.grid(column=0, row=1, columnspan=3, padx=xpad, pady=ypad)
+
+    tree = ttk.Treeview(frame, selectmode="browse",
+                            columns=("date", "car", "project",
+                        "subsystem", "tags", "collectee", "description"))
+    tree.heading("#0", text="Name", anchor="w")
+    tree.column("#0", anchor="w", width=200)
+
+    tree.heading("date", text="Date")
+    tree.column("date", anchor="center", width=150)
+
+    tree.heading("car", text="Car")
+    tree.column("car", anchor="center", width=50)
+
+    tree.heading("project", text="Project")
+    tree.column("project", anchor="center", width=200)
+
+    tree.heading("subsystem", text="Subsystem")
+    tree.column("subsystem", anchor="center", width=150)
+
+    tree.heading("tags", text="Tags")
+    tree.column("tags", anchor="center", width=200)
+
+    tree.heading("collectee", text="Collected By")
+    tree.column("collectee", anchor="center", width=200)
+
+    tree.heading("description", text="Description")
+    tree.column("description", anchor="center", width=400)
+
+    tree.tag_configure('gray', background='#cccccc')
+    tree.grid(column=0, row=0)
+
+    vsb = ttk.Scrollbar(frame, orient='vertical', command=tree.yview)
+    vsb.grid(column=1, row=0)
+    tree.configure(yscrollcommand=vsb.set)
+
+    hsb = ttk.Scrollbar(frame, orient='horizontal', command=tree.xview)
+    hsb.grid(column = 0, row=1)
+    tree.configure(xscrollcommand=hsb.set)
+
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"))
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"), tag="gray")
 
 
 if __name__ == "__main__":
