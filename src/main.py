@@ -1,32 +1,21 @@
 from tkinter import *
 from tkinter import ttk, filedialog, scrolledtext
-#import gspread
-#from oauth2client.service_account import ServiceAccountCredentials
 import datetime
 from calendarWidget import Calendar
 import sqlite3
 import uuid
+import textwrap
+
+
+def wrap(string, length=50):
+    return '\n'.join(textwrap.wrap(string, length))
 
 
 def main():
     conn = databaseInit()
     print("database opened successfully!")
-    #book = spreadsheetInit()
-    #print(book.worksheets())
     gui()
 
-"""
-def spreadsheetInit():
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('bajaDatabase-735456a2663a.json', scope)
-
-    gc = gspread.authorize(credentials)
-
-    book = gc.open_by_url("https://docs.google.com/spreadsheets/d/1Yir91DAk2HuJkvjuCnPcn7gAq5UpBjIqTXoel6G6n5A/edit#gid=0")
-    return book
-"""
 
 
 def databaseInit():
@@ -87,21 +76,24 @@ def addData(newData, nameEntry, selDateLbl, carEntry, collecteeEntry, subSel, pr
     newData.subsystem = subSel.get()
     newData.projectName = projectEntry.get()
     newData.tags = tagsEntry.get().split
-    newData.description = descEntry.get()
+    newData.description = descEntry.get("1.0", END)
     newData.file = fileNameLbl.cget("text")
 
-    """
-    saved = 0
-    while (saved != 1)
-        ID = str(uuid.uuid4()).replace('-','')
-        cursor.execute("SELECT * FROM baja_data_details WHERE DataID = ?", (ID,))
-        if len(data) == 0
-            #save new data into baja_data_details
-            saved = 1
-        else
-            #make new id
-            pass
-    """
+    saved = False
+    while not saved:
+        data_id = str(uuid.uuid4()).replace('-','')
+        print(data_id)
+        saved = True
+        # cursor.execute(f"SELECT * FROM baja_data_details WHERE DataID = {data_id}")
+        # if len(data) == 0
+        #     #save new data into baja_data_details
+        #     print("save it")
+        #     saved = True
+        # else
+        #     #make new id
+        #     print("id already exists")
+        #     pass
+
 
 
 def searchData(dialog):
@@ -220,46 +212,79 @@ def viewDataWindow():
     dialog.grid_columnconfigure(2, minsize=30)
 
     frame = Frame(dialog)
-    frame.grid(column=0, row=1, columnspan=3, padx=xpad, pady=ypad)
+    frame.grid(column=0, row=1, sticky="nsew", columnspan=3, padx=xpad, pady=ypad)
+    dialog.rowconfigure(1, minsize=400)
 
     tree = ttk.Treeview(frame, selectmode="browse",
                             columns=("date", "car", "project",
                         "subsystem", "tags", "collectee", "description"))
-    tree.heading("#0", text="Name", anchor="w")
-    tree.column("#0", anchor="w", width=200)
+    tree.heading("#0", text="Name")
+    tree.column("#0", anchor="center", width=100)
 
     tree.heading("date", text="Date")
-    tree.column("date", anchor="center", width=150)
+    tree.column("date", anchor="center", width=75)
 
     tree.heading("car", text="Car")
-    tree.column("car", anchor="center", width=50)
+    tree.column("car", anchor="center", width=40)
 
     tree.heading("project", text="Project")
-    tree.column("project", anchor="center", width=200)
+    tree.column("project", anchor="center", width=150)
 
     tree.heading("subsystem", text="Subsystem")
-    tree.column("subsystem", anchor="center", width=150)
+    tree.column("subsystem", anchor="center", width=115)
 
     tree.heading("tags", text="Tags")
-    tree.column("tags", anchor="center", width=200)
+    tree.column("tags", anchor="center", width=150)
 
     tree.heading("collectee", text="Collected By")
-    tree.column("collectee", anchor="center", width=200)
+    tree.column("collectee", anchor="center", width=150)
 
     tree.heading("description", text="Description")
-    tree.column("description", anchor="center", width=400)
+    tree.column("description", anchor="center", width=350)
 
     tree.tag_configure('gray', background='#cccccc')
-    tree.grid(column=0, row=0)
+    tree.pack(side=LEFT, fill=Y)
 
     vsb = ttk.Scrollbar(frame, orient='vertical', command=tree.yview)
-    vsb.grid(column=1, row=0)
+    vsb.pack(side=RIGHT, fill=Y)
     tree.configure(yscrollcommand=vsb.set)
 
-    hsb = ttk.Scrollbar(frame, orient='horizontal', command=tree.xview)
-    hsb.grid(column = 0, row=1)
-    tree.configure(xscrollcommand=hsb.set)
-
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", wrap("data from MR shock initial testing with all boys and girls and cats and dogs and applesauce")))
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"), tag="gray")
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"))
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Driveline Integration", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"), tag="gray")
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"))
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"), tag="gray")
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"))
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"), tag="gray")
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"))
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"), tag="gray")
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"))
+    tree.insert("", "end", text="test data", values=("05/20/2019",
+                "R19", "MR Shocks", "Suspension", "mr, suspension",
+                "Forrest", "data from MR shock initial testing"), tag="gray")
     tree.insert("", "end", text="test data", values=("05/20/2019",
                 "R19", "MR Shocks", "Suspension", "mr, suspension",
                 "Forrest", "data from MR shock initial testing"))
