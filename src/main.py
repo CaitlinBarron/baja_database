@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMainWindow, QDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMainWindow, QDialog, QFileDialog
 from PyQt5.QtCore import QSize
 import sys
 import mainUI, addUI, viewUI
@@ -32,7 +32,6 @@ class ViewWindow(QDialog, viewUI.Ui_ViewWindow):
 
     def editData(self):
         print('edit button hit')
-        print(f"{self.width()}x{self.height()}")
 
 
 class AddWindow(QDialog, addUI.Ui_AddWindow):
@@ -41,15 +40,24 @@ class AddWindow(QDialog, addUI.Ui_AddWindow):
         self.setupUi(self)
         self.submitBtn.clicked.connect(self.submitData)
         self.cancelBtn.clicked.connect(self.cancelButton)
+        self.fileBtn.clicked.connect(self.fileBrowse)
 
 
     def fileBrowse(self):
-        print('browse for file')
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileNames, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
+        filesShort = []
+        if fileNames:
+            print(fileNames)
+            for file in fileNames:
+                filesShort.append(file.split('/')[-1])
+            uiStr = ', '.join(filesShort)
+            self.fileEdit.setText(uiStr)
 
 
     def submitData(self):
         print('submit button hit')
-        print(f"{self.width()}x{self.height()}")
 
 
     def cancelButton(self):
