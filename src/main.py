@@ -1,14 +1,25 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMainWindow, QDialog, QFileDialog, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit
 from PyQt5.QtCore import QSize, QDate
+from PyQt5.QtGui import QActionEvent
+import PyQt5.QtSql
 import sys
 import mainUI, addUI, viewUI
+import sqlite3
+import uuid
+
+connection = sqlite3.connect('baja_data.db')
 
 class MainApp(QMainWindow, mainUI.Ui_MainWindow):
+
     def __init__(self, parent=None):
         super(MainApp, self).__init__(parent)
         self.setupUi(self)
         self.addBtn.clicked.connect(self.addData)
         self.viewBtn.clicked.connect(self.viewData)
+
+        self.setUpDatabase()
+        data_id = str(uuid.uuid4()).replace('-','')
+        print(data_id)
 
 
     def addData(self):
@@ -23,15 +34,40 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
         dialog.exec_()
 
 
+    def setUpDatabase(self):
+        #C:\Users\Caitlin\Documents\repositories\personal code\baja_database\src\baja_data.db
+
+        cursor = connection.cursor()
+        cursor.execute("""CREATE TABLE "baja_test_table" (
+                    "dataID"    TEXT,
+                    "name"  TEXT NOT NULL,
+                    "date"  TEXT NOT NULL,
+                    "car"   TEXT,
+                    "collectee" TEXT,
+                    "subsystem" TEXT NOT NULL,
+                    "project"   TEXT,
+                    "tags"  TEXT,
+                    "description"   TEXT NOT NULL,
+                    "files" BLOB NOT NULL,
+                    PRIMARY KEY("dataID"))""")
+
+
+
 class ViewWindow(QDialog, viewUI.Ui_ViewWindow):
     def __init__(self, parent=None):
         super(ViewWindow, self).__init__(parent)
         self.setupUi(self)
         self.editBtn.clicked.connect(self.editData)
+        self.fileBtn.clicked.connection(self.filterData)
+        print(connection)
 
 
     def editData(self):
         print('edit button hit')
+
+
+    def filterData(self):
+        print('filter data hit')
 
 
 class AddWindow(QDialog, addUI.Ui_AddWindow):
@@ -74,6 +110,7 @@ class AddWindow(QDialog, addUI.Ui_AddWindow):
         self.carDrop.addItems(self.carList)
         self.subsystemDrop.addItems(self.subsystemList)
         self.dateSelect.setDate(QDate.currentDate())
+        print(connection)
 
 
     def fileBrowse(self):
@@ -113,3 +150,5 @@ if __name__ == '__main__':
     form = MainApp()
     form.show()
     app.exec_()
+    connection.close()
+    print(connection)

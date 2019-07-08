@@ -161,6 +161,11 @@ class Ui_ViewWindow(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.horizontalLayout.addItem(spacerItem)
+        self.filterBtn = QtWidgets.QPushButton(ViewWindow)
+        self.filterBtn.setObjectName("filterBtn")
+        self.horizontalLayout.addWidget(self.filterBtn)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.horizontalLayout.addItem(spacerItem1)
         self.editBtn = QtWidgets.QPushButton(ViewWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -169,8 +174,8 @@ class Ui_ViewWindow(object):
         self.editBtn.setSizePolicy(sizePolicy)
         self.editBtn.setObjectName("editBtn")
         self.horizontalLayout.addWidget(self.editBtn)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.horizontalLayout.addItem(spacerItem1)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.horizontalLayout.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.tableView = QtWidgets.QTableView(ViewWindow)
         self.tableView.setMinimumSize(QtCore.QSize(0, 0))
@@ -184,5 +189,6 @@ class Ui_ViewWindow(object):
 
     def retranslateUi(self, ViewWindow):
         _translate = QtCore.QCoreApplication.translate
-        ViewWindow.setWindowTitle(_translate("ViewWindow", "View Data"))
+        ViewWindow.setWindowTitle(_translate("ViewWindow", "RIT Baja Database"))
+        self.filterBtn.setText(_translate("ViewWindow", "Filter Data"))
         self.editBtn.setText(_translate("ViewWindow", "Edit Data"))
