@@ -1,14 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ViewWindow</class>
- <widget class="QDialog" name="ViewWindow">
+ <class>DetailsWindow</class>
+ <widget class="QDialog" name="DetailsWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1500</width>
-    <height>700</height>
+    <width>1100</width>
+    <height>1150</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>750</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="palette">
    <palette>
@@ -425,6 +437,12 @@
     </disabled>
    </palette>
   </property>
+  <property name="font">
+   <font>
+    <family>Arial</family>
+    <pointsize>12</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>RIT Baja Database</string>
   </property>
@@ -432,9 +450,12 @@
    <iconset>
     <normaloff>../../../../../Pictures/Misc/car logo.jpg</normaloff>../../../../../Pictures/Misc/car logo.jpg</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>6</number>
+     </property>
      <property name="sizeConstraint">
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
@@ -455,38 +476,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="filterBtn">
+      <widget class="QPushButton" name="submitBtn">
        <property name="text">
-        <string>Filter Data</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="editBtn">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Edit Data</string>
+        <string>Submit Data</string>
        </property>
       </widget>
      </item>
@@ -506,26 +498,304 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="cancelBtn">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
-   <item>
-    <widget class="QTableView" name="tableView">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
+   <item row="1" column="0" rowspan="2">
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
      </property>
-     <property name="sortingEnabled">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustIgnored</enum>
+     </property>
+     <property name="widgetResizable">
       <bool>true</bool>
      </property>
-     <attribute name="horizontalHeaderCascadingSectionResizes">
-      <bool>true</bool>
-     </attribute>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1080</width>
+        <height>749</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="4" column="3" colspan="3">
+        <widget class="QComboBox" name="carDrop">
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="carLbl">
+         <property name="toolTip">
+          <string>What car was this data collected with/for?</string>
+         </property>
+         <property name="text">
+          <string>Car Name</string>
+         </property>
+         <property name="buddy">
+          <cstring>carDrop</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="projectLbl">
+         <property name="toolTip">
+          <string>What project is this for?</string>
+         </property>
+         <property name="text">
+          <string>Project Name</string>
+         </property>
+         <property name="buddy">
+          <cstring>projectEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="tagLbl">
+         <property name="toolTip">
+          <string>Tags for data, separate with commas</string>
+         </property>
+         <property name="text">
+          <string>Tags</string>
+         </property>
+         <property name="buddy">
+          <cstring>tagEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="4">
+        <widget class="QPushButton" name="fileBtn">
+         <property name="text">
+          <string>Browse</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3" colspan="3">
+        <widget class="QDateEdit" name="dateSelect">
+         <property name="dateTime">
+          <datetime>
+           <hour>0</hour>
+           <minute>0</minute>
+           <second>0</second>
+           <year>2019</year>
+           <month>7</month>
+           <day>4</day>
+          </datetime>
+         </property>
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="3" colspan="3">
+        <widget class="QPlainTextEdit" name="descriptionEdit">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="3" colspan="3">
+        <widget class="QPlainTextEdit" name="tagEdit">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+         <property name="placeholderText">
+          <string>Tags, separated with commas</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="descriptionLbl">
+         <property name="toolTip">
+          <string>What is this data?</string>
+         </property>
+         <property name="text">
+          <string>Description**</string>
+         </property>
+         <property name="buddy">
+          <cstring>descriptionEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="subsystemLbl">
+         <property name="toolTip">
+          <string>What team subgroup is this for?</string>
+         </property>
+         <property name="text">
+          <string>Subsystem**</string>
+         </property>
+         <property name="buddy">
+          <cstring>subsystemDrop</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="3" colspan="3">
+        <widget class="QLineEdit" name="collecteeEdit"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="nameLbl">
+         <property name="toolTip">
+          <string>Name for the data</string>
+         </property>
+         <property name="text">
+          <string>Name**</string>
+         </property>
+         <property name="buddy">
+          <cstring>nameEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="dateLbl">
+         <property name="toolTip">
+          <string>When was this data collected?</string>
+         </property>
+         <property name="text">
+          <string>Date Collected**</string>
+         </property>
+         <property name="buddy">
+          <cstring>dateSelect</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="fileLbl">
+         <property name="toolTip">
+          <string>Attatch data file</string>
+         </property>
+         <property name="text">
+          <string>Data File(s)**</string>
+         </property>
+         <property name="buddy">
+          <cstring>fileEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="3">
+        <widget class="QLineEdit" name="fileEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="collecteeLbl">
+         <property name="toolTip">
+          <string>Who Collected the data?</string>
+         </property>
+         <property name="text">
+          <string>Collectee</string>
+         </property>
+         <property name="buddy">
+          <cstring>collecteeEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" rowspan="9">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="7" column="3" colspan="3">
+        <widget class="QLineEdit" name="projectEdit"/>
+       </item>
+       <item row="6" column="3" colspan="3">
+        <widget class="QComboBox" name="subsystemDrop"/>
+       </item>
+       <item row="2" column="3" colspan="3">
+        <widget class="QLineEdit" name="nameEdit"/>
+       </item>
+       <item row="1" column="0" colspan="5">
+        <widget class="QLabel" name="requiredLbl">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>fields marked with a ** are required</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>nameEdit</tabstop>
+  <tabstop>dateSelect</tabstop>
+  <tabstop>carDrop</tabstop>
+  <tabstop>collecteeEdit</tabstop>
+  <tabstop>subsystemDrop</tabstop>
+  <tabstop>projectEdit</tabstop>
+  <tabstop>tagEdit</tabstop>
+  <tabstop>descriptionEdit</tabstop>
+  <tabstop>fileEdit</tabstop>
+  <tabstop>submitBtn</tabstop>
+  <tabstop>cancelBtn</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

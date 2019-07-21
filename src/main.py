@@ -3,7 +3,7 @@ from PyQt5.QtCore import QSize, QDate
 from PyQt5.QtGui import QActionEvent
 import PyQt5.QtSql
 import sys
-import mainUI, addUI, viewUI
+import mainUI, detailsUI, editUI, tableUI
 import sqlite3
 import uuid
 
@@ -23,13 +23,13 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
 
 
     def addData(self):
-        dialog = AddWindow()
+        dialog = DetailsWindow()
         dialog.show()
         dialog.exec_()
 
 
     def viewData(self):
-        dialog = ViewWindow()
+        dialog = TableWindow()
         dialog.show()
         dialog.exec_()
 
@@ -38,27 +38,27 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
         #C:\Users\Caitlin\Documents\repositories\personal code\baja_database\src\baja_data.db
 
         cursor = connection.cursor()
-        cursor.execute("""CREATE TABLE "baja_test_table" (
-                    "dataID"    TEXT,
-                    "name"  TEXT NOT NULL,
-                    "date"  TEXT NOT NULL,
-                    "car"   TEXT,
-                    "collectee" TEXT,
-                    "subsystem" TEXT NOT NULL,
-                    "project"   TEXT,
-                    "tags"  TEXT,
+        cursor.execute("""CREATE TABLE if not exists "baja_test_table" (
+                    "dataID"        TEXT,
+                    "name"          TEXT NOT NULL,
+                    "date"          TEXT NOT NULL,
+                    "car"           TEXT,
+                    "collectee"     TEXT,
+                    "subsystem"     TEXT NOT NULL,
+                    "project"       TEXT,
+                    "tags"          TEXT,
                     "description"   TEXT NOT NULL,
-                    "files" BLOB NOT NULL,
+                    "files"         BLOB NOT NULL,
                     PRIMARY KEY("dataID"))""")
 
 
 
-class ViewWindow(QDialog, viewUI.Ui_ViewWindow):
+class TableWindow(QDialog, tableUI.Ui_TableWindow):
     def __init__(self, parent=None):
-        super(ViewWindow, self).__init__(parent)
+        super(TableWindow, self).__init__(parent)
         self.setupUi(self)
         self.editBtn.clicked.connect(self.editData)
-        self.fileBtn.clicked.connection(self.filterData)
+        self.filterBtn.clicked.connect(self.filterData)
         print(connection)
 
 
@@ -70,7 +70,8 @@ class ViewWindow(QDialog, viewUI.Ui_ViewWindow):
         print('filter data hit')
 
 
-class AddWindow(QDialog, addUI.Ui_AddWindow):
+
+class EditWindow(QDialog, editUI.Ui_EditWindow):
     carList = ['',
                 'j-arm',
                 'semi',
@@ -100,7 +101,84 @@ class AddWindow(QDialog, addUI.Ui_AddWindow):
     fileNames = []
 
     def __init__(self, parent=None):
-        super(AddWindow, self).__init__(parent)
+        super(EditWindow, self).__init__(parent)
+        self.setupUi(self)
+
+        self.deleteBtn.clicked.connect(self.deleteData)
+        self.submitBtn.clicked.connect(self.resubmitData)
+        self.cancelBtn.clicked.connect(self.cancelEditButton)
+        self.fileBtn.clicked.connect(self.changeFiles)
+
+        self.carDrop.addItems(self.carList)
+        self.subsystemDrop.addItems(self.subsystemList)
+        self.dateSelect.setDate(QDate.currentDate())
+        print(connection)
+
+
+    def changeFiles(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
+        filesShort = []
+        if files:
+            print(files)
+            self.fileNames = files
+            for file in files:
+                filesShort.append(file.split('/')[-1])
+            uiStr = ', '.join(filesShort)
+            self.fileEdit.setText(uiStr)
+
+
+    def resubmitData(self):
+        name = self.nameEdit.text()
+        date = self.dateSelect.date()
+        car = self.carDrop.currentText()
+        collectee = self.collecteeEdit.text()
+        subsystem = self.subsystemDrop.currentText()
+        project = self.projectEdit.text()
+        tags = self.tagEdit.selectAll()
+        description = self.descriptionEdit.selectAll()
+        files = self.fileNames
+        print(f"data to submit \nname: {name}\ndate: {date}\ncar: {car}\ncollectee: {collectee}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
+
+
+    def cancelEditButton(self):
+        self.reject()
+
+
+
+
+class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
+    carList = ['',
+                'j-arm',
+                'semi',
+                'r15',
+                'r16',
+                'r17',
+                'r18',
+                'r19',
+                'r20']
+    subsystemList = ['',
+                    'Frame',
+                    'Suspension',
+                    'Steering',
+                    'Outboard',
+                    'Brakes',
+                    'Ergonomics',
+                    'Reduction',
+                    'CVT',
+                    'Electrical',
+                    'R&D',
+                    'Manufacturing',
+                    'Engine',
+                    'Composites',
+                    'Driveline Integration',
+                    'Eboard',
+                    'Other']
+    fileNames = []
+
+    def __init__(self, parent=None):
+        super(DetailsWindow, self).__init__(parent)
         self.setupUi(self)
 
         self.submitBtn.clicked.connect(self.submitData)

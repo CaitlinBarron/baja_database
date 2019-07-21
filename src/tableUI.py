@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'viewUI.ui'
+# Form implementation generated from reading ui file 'tableUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.12.3
 #
@@ -10,10 +10,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_ViewWindow(object):
-    def setupUi(self, ViewWindow):
-        ViewWindow.setObjectName("ViewWindow")
-        ViewWindow.resize(1500, 700)
+class Ui_TableWindow(object):
+    def setupUi(self, TableWindow):
+        TableWindow.setObjectName("TableWindow")
+        TableWindow.resize(1500, 700)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -150,23 +150,23 @@ class Ui_ViewWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.ToolTipText, brush)
-        ViewWindow.setPalette(palette)
+        TableWindow.setPalette(palette)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../../../../../Pictures/Misc/car logo.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        ViewWindow.setWindowIcon(icon)
-        self.verticalLayout = QtWidgets.QVBoxLayout(ViewWindow)
+        TableWindow.setWindowIcon(icon)
+        self.verticalLayout = QtWidgets.QVBoxLayout(TableWindow)
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.horizontalLayout.addItem(spacerItem)
-        self.filterBtn = QtWidgets.QPushButton(ViewWindow)
+        self.filterBtn = QtWidgets.QPushButton(TableWindow)
         self.filterBtn.setObjectName("filterBtn")
         self.horizontalLayout.addWidget(self.filterBtn)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.horizontalLayout.addItem(spacerItem1)
-        self.editBtn = QtWidgets.QPushButton(ViewWindow)
+        self.editBtn = QtWidgets.QPushButton(TableWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -177,18 +177,18 @@ class Ui_ViewWindow(object):
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.horizontalLayout.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout)
-        self.tableView = QtWidgets.QTableView(ViewWindow)
+        self.tableView = QtWidgets.QTableView(TableWindow)
         self.tableView.setMinimumSize(QtCore.QSize(0, 0))
         self.tableView.setSortingEnabled(True)
         self.tableView.setObjectName("tableView")
         self.tableView.horizontalHeader().setCascadingSectionResizes(True)
         self.verticalLayout.addWidget(self.tableView)
 
-        self.retranslateUi(ViewWindow)
-        QtCore.QMetaObject.connectSlotsByName(ViewWindow)
+        self.retranslateUi(TableWindow)
+        QtCore.QMetaObject.connectSlotsByName(TableWindow)
 
-    def retranslateUi(self, ViewWindow):
+    def retranslateUi(self, TableWindow):
         _translate = QtCore.QCoreApplication.translate
-        ViewWindow.setWindowTitle(_translate("ViewWindow", "RIT Baja Database"))
-        self.filterBtn.setText(_translate("ViewWindow", "Filter Data"))
-        self.editBtn.setText(_translate("ViewWindow", "Edit Data"))
+        TableWindow.setWindowTitle(_translate("TableWindow", "RIT Baja Database"))
+        self.filterBtn.setText(_translate("TableWindow", "Filter Data"))
+        self.editBtn.setText(_translate("TableWindow", "Edit Data"))
