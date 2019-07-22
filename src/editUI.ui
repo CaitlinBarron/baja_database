@@ -460,29 +460,6 @@
       <enum>QLayout::SetDefaultConstraint</enum>
      </property>
      <item>
-      <spacer name="verticalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="deleteBtn">
-       <property name="text">
-        <string>Delete Data</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="verticalSpacer_2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -628,13 +605,6 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="4">
-        <widget class="QPushButton" name="fileBtn">
-         <property name="text">
-          <string>Browse</string>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="3" colspan="3">
         <widget class="QDateEdit" name="dateSelect">
          <property name="dateTime">
@@ -699,7 +669,7 @@
         </widget>
        </item>
        <item row="5" column="3" colspan="3">
-        <widget class="QLineEdit" name="collecteeEdit"/>
+        <widget class="QLineEdit" name="collectorEdit"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="nameLbl">
@@ -748,15 +718,15 @@
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="collecteeLbl">
+        <widget class="QLabel" name="collectorLbl">
          <property name="toolTip">
           <string>Who Collected the data?</string>
          </property>
          <property name="text">
-          <string>Collectee</string>
+          <string>Collector</string>
          </property>
          <property name="buddy">
-          <cstring>collecteeEdit</cstring>
+          <cstring>collectorEdit</cstring>
          </property>
         </widget>
        </item>
@@ -799,6 +769,13 @@
          </property>
         </widget>
        </item>
+       <item row="10" column="4" colspan="2">
+        <widget class="QPushButton" name="fileBtn">
+         <property name="text">
+          <string>Browse</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -809,7 +786,7 @@
   <tabstop>nameEdit</tabstop>
   <tabstop>dateSelect</tabstop>
   <tabstop>carDrop</tabstop>
-  <tabstop>collecteeEdit</tabstop>
+  <tabstop>collectorEdit</tabstop>
   <tabstop>subsystemDrop</tabstop>
   <tabstop>projectEdit</tabstop>
   <tabstop>tagEdit</tabstop>

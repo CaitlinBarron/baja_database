@@ -3,9 +3,15 @@ from PyQt5.QtCore import QSize, QDate
 from PyQt5.QtGui import QActionEvent
 import PyQt5.QtSql
 import sys
+import shutil
 import mainUI, detailsUI, editUI, tableUI
 import sqlite3
 import uuid
+
+'''
+use 'pyuic filename.ui -o filename.py' to convert UI files
+"C:\\Users\\Caitlin\\Documents\\repositories\\personal code\\baja_database\\testing storage"
+'''
 
 connection = sqlite3.connect('baja_data.db')
 
@@ -23,7 +29,7 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
 
 
     def addData(self):
-        dialog = DetailsWindow()
+        dialog = EditWindow()
         dialog.show()
         dialog.exec_()
 
@@ -43,7 +49,7 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
                     "name"          TEXT NOT NULL,
                     "date"          TEXT NOT NULL,
                     "car"           TEXT,
-                    "collectee"     TEXT,
+                    "collector"     TEXT,
                     "subsystem"     TEXT NOT NULL,
                     "project"       TEXT,
                     "tags"          TEXT,
@@ -68,6 +74,38 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
 
     def filterData(self):
         print('filter data hit')
+
+
+
+class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
+    def __init__(self, parent=None):
+        super(DetailsWindow, self).__init__(parent)
+        self.setupUi(self)
+
+        self.deleteBtn.clicked.connect(self.deleteData)
+        self.editBtn.clicked.connect(self.editData)
+        self.copyBtn.clicked.connect(self.copyData)
+        self.cancelBtn.clicked.connect(self.cancelButton)
+        print(connection)
+
+
+    def deleteData(self):
+        print("delete this data")
+
+
+    def editData(self):
+        #pass this data along somehow
+        dialog = EditWindow()
+        dialog.show()
+        dialog.exec_()
+
+
+    def copyData(self):
+        print("save a copy of this data")
+
+
+    def cancelButton(self):
+        self.reject()
 
 
 
@@ -104,86 +142,9 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         super(EditWindow, self).__init__(parent)
         self.setupUi(self)
 
-        self.deleteBtn.clicked.connect(self.deleteData)
-        self.submitBtn.clicked.connect(self.resubmitData)
-        self.cancelBtn.clicked.connect(self.cancelEditButton)
-        self.fileBtn.clicked.connect(self.changeFiles)
-
-        self.carDrop.addItems(self.carList)
-        self.subsystemDrop.addItems(self.subsystemList)
-        self.dateSelect.setDate(QDate.currentDate())
-        print(connection)
-
-
-    def changeFiles(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
-        filesShort = []
-        if files:
-            print(files)
-            self.fileNames = files
-            for file in files:
-                filesShort.append(file.split('/')[-1])
-            uiStr = ', '.join(filesShort)
-            self.fileEdit.setText(uiStr)
-
-
-    def resubmitData(self):
-        name = self.nameEdit.text()
-        date = self.dateSelect.date()
-        car = self.carDrop.currentText()
-        collectee = self.collecteeEdit.text()
-        subsystem = self.subsystemDrop.currentText()
-        project = self.projectEdit.text()
-        tags = self.tagEdit.selectAll()
-        description = self.descriptionEdit.selectAll()
-        files = self.fileNames
-        print(f"data to submit \nname: {name}\ndate: {date}\ncar: {car}\ncollectee: {collectee}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
-
-
-    def cancelEditButton(self):
-        self.reject()
-
-
-
-
-class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
-    carList = ['',
-                'j-arm',
-                'semi',
-                'r15',
-                'r16',
-                'r17',
-                'r18',
-                'r19',
-                'r20']
-    subsystemList = ['',
-                    'Frame',
-                    'Suspension',
-                    'Steering',
-                    'Outboard',
-                    'Brakes',
-                    'Ergonomics',
-                    'Reduction',
-                    'CVT',
-                    'Electrical',
-                    'R&D',
-                    'Manufacturing',
-                    'Engine',
-                    'Composites',
-                    'Driveline Integration',
-                    'Eboard',
-                    'Other']
-    fileNames = []
-
-    def __init__(self, parent=None):
-        super(DetailsWindow, self).__init__(parent)
-        self.setupUi(self)
-
         self.submitBtn.clicked.connect(self.submitData)
         self.cancelBtn.clicked.connect(self.cancelButton)
-        self.fileBtn.clicked.connect(self.fileBrowse)
+        self.fileBtn.clicked.connect(self.fileSelect)
 
         self.carDrop.addItems(self.carList)
         self.subsystemDrop.addItems(self.subsystemList)
@@ -191,7 +152,7 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         print(connection)
 
 
-    def fileBrowse(self):
+    def fileSelect(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
@@ -209,13 +170,13 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         name = self.nameEdit.text()
         date = self.dateSelect.date()
         car = self.carDrop.currentText()
-        collectee = self.collecteeEdit.text()
+        collector = self.collectorEdit.text()
         subsystem = self.subsystemDrop.currentText()
         project = self.projectEdit.text()
         tags = self.tagEdit.selectAll()
         description = self.descriptionEdit.selectAll()
         files = self.fileNames
-        print(f"data to submit \nname: {name}\ndate: {date}\ncar: {car}\ncollectee: {collectee}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
+        print(f"data to submit \nname: {name}\ndate: {date}\ncar: {car}\ncollector: {collector}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
 
 
     def cancelButton(self):

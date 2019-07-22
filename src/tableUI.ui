@@ -478,7 +478,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="editBtn">
+      <widget class="QPushButton" name="detailsBtn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -486,7 +486,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Edit Data</string>
+        <string>Data Details</string>
        </property>
       </widget>
      </item>
