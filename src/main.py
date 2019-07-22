@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMainWindow, QDialog, QFileDialog, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit
 from PyQt5.QtCore import QSize, QDate
 from PyQt5.QtGui import QActionEvent
+from typing import List
 import PyQt5.QtSql
 import sys
 import shutil
+from dataclasses import dataclass
 import mainUI, detailsUI, editUI, tableUI
 import sqlite3
 import uuid
@@ -15,17 +17,44 @@ use 'pyuic filename.ui -o filename.py' to convert UI files
 
 connection = sqlite3.connect('baja_data.db')
 
+
+@dataclass
+class Datafile:
+    dataID: str
+    name: str
+    date: str
+    car: str
+    collector: str
+    subsystem: str
+    project: str
+    tags: str
+    description: str
+    files: List[str]
+
+    def tagsToList():
+        return self.tags.split(",")
+
+    def shortFilesString():
+        filesShort = []
+        for file in self.Files:
+            filesShort.append(file.split('/')[-1])
+        return ', '.join(filesShort)
+
+    def longFilesString():
+        return ', '.join(self.files)
+
+
+
 class MainApp(QMainWindow, mainUI.Ui_MainWindow):
 
     def __init__(self, parent=None):
         super(MainApp, self).__init__(parent)
         self.setupUi(self)
+
         self.addBtn.clicked.connect(self.addData)
         self.viewBtn.clicked.connect(self.viewData)
 
         self.setUpDatabase()
-        data_id = str(uuid.uuid4()).replace('-','')
-        print(data_id)
 
 
     def addData(self):
@@ -86,6 +115,7 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         self.editBtn.clicked.connect(self.editData)
         self.copyBtn.clicked.connect(self.copyData)
         self.cancelBtn.clicked.connect(self.cancelButton)
+
         print(connection)
 
 
@@ -176,7 +206,13 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         tags = self.tagEdit.selectAll()
         description = self.descriptionEdit.selectAll()
         files = self.fileNames
+
         print(f"data to submit \nname: {name}\ndate: {date}\ncar: {car}\ncollector: {collector}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
+
+        data_id = str(uuid.uuid4()).replace('-','')
+        print(data_id)
+        #test = Datafile("1", "crio data", "7/22/2019", "r19", "caitlin", "R&D", "database", "lame, testing, cats are best", "this is 4 practicing", ["src/detailsUI.ui"])
+        #print(test.date)
 
 
     def cancelButton(self):
