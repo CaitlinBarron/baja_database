@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMainWindow, QDialog, QFileDialog, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMainWindow, QDialog, QFileDialog, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit, QTableWidgetItem, QTableWidget
 from PyQt5.QtCore import QSize, QDate
 from PyQt5.QtGui import QActionEvent
 from typing import List
@@ -11,7 +11,9 @@ import sqlite3
 import uuid
 
 '''
-use 'pyuic filename.ui -o filename.py' to convert UI files
+cd C:\\Users\\Caitlin\\Documents\\repositories\\personal code\
+baja_database\\src
+use 'pyuic5 filename.ui -o filename.py' to convert UI files
 "C:\\Users\\Caitlin\\Documents\\repositories\\personal code\\baja_database\\testing storage"
 '''
 
@@ -92,13 +94,37 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
     def __init__(self, parent=None):
         super(TableWindow, self).__init__(parent)
         self.setupUi(self)
-        self.editBtn.clicked.connect(self.editData)
+        self.detailsBtn.clicked.connect(self.dataDetails)
         self.filterBtn.clicked.connect(self.filterData)
-        print(connection)
+        self.populateTable()
+
+    def populateTable(self):
+        cursor = connection.cursor()
+        cursor.execute('''SELECT * FROM baja_test_table ''')
+        rows = cursor.fetchall()
+        self.tableWidget.setColumnCount(9)
+        headerList = ['Name', 'Date', 'Car', 'Collector', 'Subsystem', 'Project', 'Tags', 'Description', 'Files']
+        self.tableWidget.setHorizontalHeaderLabels(headerList)
+
+        for row in rows:
+            i = rows.index(row)
+            self.tableWidget.insertRow(i)
+            self.tableWidget.setItem(i, 0, QTableWidgetItem(row[1]))
+            self.tableWidget.setItem(i, 1, QTableWidgetItem(row[2]))
+            self.tableWidget.setItem(i, 2, QTableWidgetItem(row[3]))
+            self.tableWidget.setItem(i, 3, QTableWidgetItem(row[4]))
+            self.tableWidget.setItem(i, 4, QTableWidgetItem(row[5]))
+            self.tableWidget.setItem(i, 5, QTableWidgetItem(row[6]))
+            self.tableWidget.setItem(i, 6, QTableWidgetItem(row[7]))
+            self.tableWidget.setItem(i, 7, QTableWidgetItem(row[8]))
+            self.tableWidget.setItem(i, 8, QTableWidgetItem(row[9]))
 
 
-    def editData(self):
-        print('edit button hit')
+    def dataDetails(self):
+        print('details button hit')
+        dialog = DetailsWindow()
+        dialog.show()
+        dialog.exec_()
 
 
     def filterData(self):
@@ -188,7 +214,6 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
         filesShort = []
         if files:
-            print(files)
             self.fileNames = files
             for file in files:
                 filesShort.append(file.split('/')[-1])
@@ -197,22 +222,24 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
 
 
     def submitData(self):
-        name = self.nameEdit.text()
-        date = self.dateSelect.date()
-        car = self.carDrop.currentText()
-        collector = self.collectorEdit.text()
+        name = self.nameEdit.text().lower()
+        date = self.dateSelect.date().toString('MM/dd/')
+        car = self.carDrop.currentText().lower()
+        collector = self.collectorEdit.text().lower()
         subsystem = self.subsystemDrop.currentText()
-        project = self.projectEdit.text()
-        tags = self.tagEdit.selectAll()
-        description = self.descriptionEdit.selectAll()
+        project = self.projectEdit.text().lower()
+        tags = self.tagEdit.toPlainText().lower()
+        description = self.descriptionEdit.toPlainText().lower()
         files = self.fileNames
 
-        print(f"data to submit \nname: {name}\ndate: {date}\ncar: {car}\ncollector: {collector}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
 
         data_id = str(uuid.uuid4()).replace('-','')
-        print(data_id)
-        #test = Datafile("1", "crio data", "7/22/2019", "r19", "caitlin", "R&D", "database", "lame, testing, cats are best", "this is 4 practicing", ["src/detailsUI.ui"])
-        #print(test.date)
+        print(f"data to submit \nid: {data_id}\nname: {name}\ndate: {date}\ncar: {car}\ncollector: {collector}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
+
+        cursor = connection.cursor()
+        insertCommand = '''INSERT INTO baja_test_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
+        newData = (data_id, name, date, car, collector, subsystem, project, tags, description, files)
+        cursor.execute(insertCommand, newData)
 
 
     def cancelButton(self):
