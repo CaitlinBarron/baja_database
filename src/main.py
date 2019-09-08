@@ -5,10 +5,10 @@ from typing import List
 import PyQt5.QtSql
 import sys
 import shutil
-from dataclasses import dataclass
 import mainUI, detailsUI, editUI, tableUI
 import sqlite3
 import uuid
+import pickle
 
 '''
 cd C:\\Users\\Caitlin\\Documents\\repositories\\personal code\
@@ -20,30 +20,20 @@ use 'pyuic5 filename.ui -o filename.py' to convert UI files
 connection = sqlite3.connect('baja_data.db')
 
 
-@dataclass
-class Datafile:
-    dataID: str
-    name: str
-    date: str
-    car: str
-    collector: str
-    subsystem: str
-    project: str
-    tags: str
-    description: str
-    files: List[str]
+def srtToList(tags):
+    tagsShort = []
+    for tag in tags.split(','):
+        tagsShort.append(tag.strip())
+    return tagsShort
 
-    def tagsToList():
-        return self.tags.split(",")
+def shortFileNames(files):
+    filesShort = []
+    for file in files:
+        filesShort.append(file.split('/')[-1])
+    return filesShort
 
-    def shortFilesString():
-        filesShort = []
-        for file in self.Files:
-            filesShort.append(file.split('/')[-1])
-        return ', '.join(filesShort)
-
-    def longFilesString():
-        return ', '.join(self.files)
+def listToStr(files):
+    return ', '.join(files)
 
 
 
@@ -108,6 +98,10 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
 
         for row in rows:
             i = rows.index(row)
+            files = pickle.loads(row[9])
+            shortFiles = shortFileNames(files)
+            filestr = listToStr(shortFiles)
+            name = row[1]
             self.tableWidget.insertRow(i)
             self.tableWidget.setItem(i, 0, QTableWidgetItem(row[1]))
             self.tableWidget.setItem(i, 1, QTableWidgetItem(row[2]))
@@ -117,7 +111,10 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
             self.tableWidget.setItem(i, 5, QTableWidgetItem(row[6]))
             self.tableWidget.setItem(i, 6, QTableWidgetItem(row[7]))
             self.tableWidget.setItem(i, 7, QTableWidgetItem(row[8]))
-            self.tableWidget.setItem(i, 8, QTableWidgetItem(row[9]))
+            self.tableWidget.setItem(i, 8, QTableWidgetItem(filestr))
+
+        self.tableWidget.resizeColumnsToContents()
+        self.tableWidget.showGrid()
 
 
     def dataDetails(self):
@@ -205,32 +202,27 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         self.carDrop.addItems(self.carList)
         self.subsystemDrop.addItems(self.subsystemList)
         self.dateSelect.setDate(QDate.currentDate())
-        print(connection)
 
 
     def fileSelect(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
-        filesShort = []
         if files:
             self.fileNames = files
-            for file in files:
-                filesShort.append(file.split('/')[-1])
-            uiStr = ', '.join(filesShort)
-            self.fileEdit.setText(uiStr)
+            self.fileEdit.setText(listToStr(shortFileNames(files)))
 
 
     def submitData(self):
         name = self.nameEdit.text().lower()
-        date = self.dateSelect.date().toString('MM/dd/')
+        date = self.dateSelect.date().toString('MM/dd/yyyy')
         car = self.carDrop.currentText().lower()
         collector = self.collectorEdit.text().lower()
         subsystem = self.subsystemDrop.currentText()
         project = self.projectEdit.text().lower()
         tags = self.tagEdit.toPlainText().lower()
         description = self.descriptionEdit.toPlainText().lower()
-        files = self.fileNames
+        files = pickle.dumps(self.fileNames)
 
 
         data_id = str(uuid.uuid4()).replace('-','')
@@ -240,6 +232,9 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         insertCommand = '''INSERT INTO baja_test_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
         newData = (data_id, name, date, car, collector, subsystem, project, tags, description, files)
         cursor.execute(insertCommand, newData)
+        print(cursor.lastrowid)
+        connection.commit()
+        print(cursor.fetchall())
 
 
     def cancelButton(self):
