@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMainWindow, QDialog, QFileDialog, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit, QTableWidgetItem, QTableWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMainWindow, QDialog, QFileDialog, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit, QTableWidgetItem, QTableWidget,QMessageBox
 from PyQt5.QtCore import QSize, QDate
 from PyQt5.QtGui import QActionEvent
 from typing import List
@@ -17,10 +17,10 @@ use 'pyuic5 filename.ui -o filename.py' to convert UI files
 "C:\\Users\\Caitlin\\Documents\\repositories\\personal code\\baja_database\\testing storage"
 '''
 
-connection = sqlite3.connect('baja_data.db')
+CONNECTION = sqlite3.connect('baja_data.db')
 
 
-def srtToList(tags):
+def strToList(tags):
     tagsShort = []
     for tag in tags.split(','):
         tagsShort.append(tag.strip())
@@ -30,6 +30,7 @@ def shortFileNames(files):
     filesShort = []
     for file in files:
         filesShort.append(file.split('/')[-1])
+
     return filesShort
 
 def listToStr(files):
@@ -64,7 +65,7 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
     def setUpDatabase(self):
         #C:\Users\Caitlin\Documents\repositories\personal code\baja_database\src\baja_data.db
 
-        cursor = connection.cursor()
+        cursor = CONNECTION.cursor()
         cursor.execute("""CREATE TABLE if not exists "baja_test_table" (
                     "dataID"        TEXT,
                     "name"          TEXT NOT NULL,
@@ -85,15 +86,16 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
         super(TableWindow, self).__init__(parent)
         self.setupUi(self)
         self.detailsBtn.clicked.connect(self.dataDetails)
+        self.tableWidget.cellDoubleClicked.connect(self.dataDetails)
         self.filterBtn.clicked.connect(self.filterData)
         self.populateTable()
 
     def populateTable(self):
-        cursor = connection.cursor()
+        cursor = CONNECTION.cursor()
         cursor.execute('''SELECT * FROM baja_test_table ''')
         rows = cursor.fetchall()
-        self.tableWidget.setColumnCount(9)
-        headerList = ['Name', 'Date', 'Car', 'Collector', 'Subsystem', 'Project', 'Tags', 'Description', 'Files']
+        self.tableWidget.setColumnCount(10)
+        headerList = ['Name', 'Date', 'Car', 'Collector', 'Subsystem', 'Project', 'Tags', 'Description', 'Files', 'id']
         self.tableWidget.setHorizontalHeaderLabels(headerList)
 
         for row in rows:
@@ -112,16 +114,27 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
             self.tableWidget.setItem(i, 6, QTableWidgetItem(row[7]))
             self.tableWidget.setItem(i, 7, QTableWidgetItem(row[8]))
             self.tableWidget.setItem(i, 8, QTableWidgetItem(filestr))
+            self.tableWidget.setItem(i, 9, QTableWidgetItem(row[0]))
 
         self.tableWidget.resizeColumnsToContents()
         self.tableWidget.showGrid()
 
 
     def dataDetails(self):
-        print('details button hit')
-        dialog = DetailsWindow()
+        data = []
+        rowNum = self.tableWidget.currentRow()
+        cursor = CONNECTION.cursor()
+        dataId = self.tableWidget.item(rowNum, 9).text()
+        cursor.execute('SELECT * FROM baja_test_table WHERE dataID=?;', (dataId,))
+        row = cursor.fetchall()[0]
+        for item in row:
+            data.append(item)
+        data[9] = pickle.loads(data[9])
+        dialog = DetailsWindow(data)
         dialog.show()
         dialog.exec_()
+        self.tableWidget.setRowCount(0)
+        self.populateTable()
 
 
     def filterData(self):
@@ -130,7 +143,7 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
 
 
 class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
-    def __init__(self, parent=None):
+    def __init__(self, data, parent=None):
         super(DetailsWindow, self).__init__(parent)
         self.setupUi(self)
 
@@ -139,16 +152,40 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         self.copyBtn.clicked.connect(self.copyData)
         self.cancelBtn.clicked.connect(self.cancelButton)
 
-        print(connection)
+        self.data = data
+        self.dataId = data[0]
+        self.nameDisp.setText(data[1])
+        self.dateDisp.setText(data[2])
+        self.carDisp.setText(data[3])
+        self.collectorDisp.setText(data[4])
+        self.subsystemDisp.setText(data[5])
+        self.projectDisp.setText(data[6])
+        self.tagDisp.setPlainText(data[7])
+        self.descriptionDisp.setPlainText(data[8])
+        self.fileDisp .setText(listToStr(shortFileNames(data[9])))
+
+        print(CONNECTION)
 
 
     def deleteData(self):
-        print("delete this data")
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+
+        msg.setText("Are you sure you want to delete this data?")
+        msg.setWindowTitle("Delete data?")
+        msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        confirm = msg.exec_()
+        print(confirm == QMessageBox.Yes)
+        if confirm == QMessageBox.Yes:
+            cursor = CONNECTION.cursor()
+            cursor.execute('DELETE FROM baja_test_table where dataID=?;', (self.dataId,))
+            CONNECTION.commit()
+            self.cancelButton()
 
 
     def editData(self):
         #pass this data along somehow
-        dialog = EditWindow()
+        dialog = EditWindow(self.data)
         dialog.show()
         dialog.exec_()
 
@@ -159,7 +196,6 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
 
     def cancelButton(self):
         self.reject()
-
 
 
 class EditWindow(QDialog, editUI.Ui_EditWindow):
@@ -191,9 +227,10 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
                     'Other']
     fileNames = []
 
-    def __init__(self, parent=None):
+    def __init__(self, data = [],parent=None):
         super(EditWindow, self).__init__(parent)
         self.setupUi(self)
+        self.fileNames = []
 
         self.submitBtn.clicked.connect(self.submitData)
         self.cancelBtn.clicked.connect(self.cancelButton)
@@ -224,17 +261,17 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         description = self.descriptionEdit.toPlainText().lower()
         files = pickle.dumps(self.fileNames)
 
+        if name and date and subsystem and description and self.fileNames:
+            data_id = str(uuid.uuid4()).replace('-','')
+            print(f"data to submit \nid: {data_id}\nname: {name}\ndate: {date}\ncar: {car}\ncollector: {collector}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
 
-        data_id = str(uuid.uuid4()).replace('-','')
-        print(f"data to submit \nid: {data_id}\nname: {name}\ndate: {date}\ncar: {car}\ncollector: {collector}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
-
-        cursor = connection.cursor()
-        insertCommand = '''INSERT INTO baja_test_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
-        newData = (data_id, name, date, car, collector, subsystem, project, tags, description, files)
-        cursor.execute(insertCommand, newData)
-        print(cursor.lastrowid)
-        connection.commit()
-        print(cursor.fetchall())
+            cursor = CONNECTION.cursor()
+            insertCommand = 'INSERT INTO baja_test_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'
+            newData = (data_id, name, date, car, collector, subsystem, project, tags, description, files)
+            cursor.execute(insertCommand, newData)
+            print(cursor.lastrowid)
+            CONNECTION.commit()
+            self.cancelButton()
 
 
     def cancelButton(self):
@@ -247,5 +284,5 @@ if __name__ == '__main__':
     form = MainApp()
     form.show()
     app.exec_()
-    connection.close()
-    print(connection)
+    CONNECTION.close()
+    print(CONNECTION)
