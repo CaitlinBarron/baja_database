@@ -116,6 +116,7 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
             self.tableWidget.setItem(i, 8, QTableWidgetItem(filestr))
             self.tableWidget.setItem(i, 9, QTableWidgetItem(row[0]))
 
+        self.tableWidget.setColumnHidden(9, True)
         self.tableWidget.resizeColumnsToContents()
         self.tableWidget.showGrid()
 
@@ -162,9 +163,7 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         self.projectDisp.setText(data[6])
         self.tagDisp.setPlainText(data[7])
         self.descriptionDisp.setPlainText(data[8])
-        self.fileDisp .setText(listToStr(shortFileNames(data[9])))
-
-        print(CONNECTION)
+        self.fileDisp.setText(listToStr(shortFileNames(data[9])))
 
 
     def deleteData(self):
@@ -175,7 +174,6 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         msg.setWindowTitle("Delete data?")
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirm = msg.exec_()
-        print(confirm == QMessageBox.Yes)
         if confirm == QMessageBox.Yes:
             cursor = CONNECTION.cursor()
             cursor.execute('DELETE FROM baja_test_table where dataID=?;', (self.dataId,))
@@ -231,6 +229,7 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         super(EditWindow, self).__init__(parent)
         self.setupUi(self)
         self.fileNames = []
+        self.data = data
 
         self.submitBtn.clicked.connect(self.submitData)
         self.cancelBtn.clicked.connect(self.cancelButton)
@@ -239,6 +238,19 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         self.carDrop.addItems(self.carList)
         self.subsystemDrop.addItems(self.subsystemList)
         self.dateSelect.setDate(QDate.currentDate())
+
+        if data:
+            self.nameEdit.setText(data[1])
+            date = data[2].split('/')
+            self.dateSelect.setDate(QDate(int(date[2]), int(date[0]), int(date[1])))
+            self.carDrop.setCurrentText(data[3])
+            self.collectorEdit.setText(data[4])
+            self.subsystemDrop.setCurrentText(data[5])
+            self.projectEdit.setText(data[6])
+            self.tagEdit.setPlainText(data[7])
+            self.descriptionEdit.setPlainText(data[8])
+            self.fileNames = data[9]
+            self.fileEdit.setText(listToStr(shortFileNames(self.fileNames)))
 
 
     def fileSelect(self):
@@ -269,7 +281,6 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
             insertCommand = 'INSERT INTO baja_test_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'
             newData = (data_id, name, date, car, collector, subsystem, project, tags, description, files)
             cursor.execute(insertCommand, newData)
-            print(cursor.lastrowid)
             CONNECTION.commit()
             self.cancelButton()
 
@@ -285,4 +296,3 @@ if __name__ == '__main__':
     form.show()
     app.exec_()
     CONNECTION.close()
-    print(CONNECTION)
