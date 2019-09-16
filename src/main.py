@@ -196,6 +196,7 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
 
     def copyData(self):
         print("save a copy of this data")
+        #TODO: ALL OF THIS
 
 
     def updateWindow(self):
@@ -324,6 +325,9 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
             newData = (data_id, name, date, car, collector, subsystem, project, tags, description, files)
             cursor.execute(insertCommand, newData)
             CONNECTION.commit()
+
+            #TODO: copy new files into right place in storage
+
             self.cancelButton()
         else:
             msg = QMessageBox()
@@ -357,6 +361,9 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
             if self.fileNames != self.data[9]:
                 updateStr = f"{updateStrStart} {DB_COLS[9]} = ? WHERE dataID = '{self.data[0]}';"
                 cursor.execute(updateStr, (pickle.dumps(newData[9]),))
+
+                #TODO: replace old files in storage with the new files
+
             CONNECTION.commit()
             self.cancelButton()
         else:
@@ -378,6 +385,8 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         params.append(self.tagEdit.toPlainText().lower())
         params.append(self.descriptionEdit.toPlainText().lower())
         searchStrStart = "SELECT FROM baja_test_table WHERE"
+
+        #TODO: finish search functionality
 
 
     def cancelButton(self):
