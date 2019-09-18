@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EditWindow</class>
- <widget class="QDialog" name="EditWindow">
+ <class>FilterWindow</class>
+ <widget class="QDialog" name="FilterWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1020</width>
-    <height>1150</height>
+    <width>1100</width>
+    <height>1000</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -476,9 +476,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="submitBtn">
+      <widget class="QPushButton" name="searchBtn">
        <property name="text">
-        <string>Submit Data</string>
+        <string>Search Data</string>
        </property>
       </widget>
      </item>
@@ -554,146 +554,22 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1000</width>
-        <height>749</height>
+        <width>1080</width>
+        <height>649</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="6" column="0">
-        <widget class="QLabel" name="subsystemLbl">
-         <property name="toolTip">
-          <string>What team subgroup is this for?</string>
-         </property>
+       <item row="2" column="2">
+        <widget class="QCheckBox" name="dateCheck">
          <property name="text">
-          <string>Subsystem**</string>
+          <string/>
          </property>
-         <property name="buddy">
-          <cstring>subsystemDrop</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="3" colspan="3">
-        <widget class="QLineEdit" name="collectorEdit"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="nameLbl">
-         <property name="toolTip">
-          <string>Name for the data</string>
-         </property>
-         <property name="text">
-          <string>Name**</string>
-         </property>
-         <property name="buddy">
-          <cstring>nameEdit</cstring>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="descriptionLbl">
-         <property name="toolTip">
-          <string>What is this data?</string>
-         </property>
-         <property name="text">
-          <string>Description**</string>
-         </property>
-         <property name="buddy">
-          <cstring>descriptionEdit</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="3">
-        <widget class="QLineEdit" name="fileEdit">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="collectorLbl">
-         <property name="toolTip">
-          <string>Who Collected the data?</string>
-         </property>
-         <property name="text">
-          <string>Collector</string>
-         </property>
-         <property name="buddy">
-          <cstring>collectorEdit</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" rowspan="9">
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="fileLbl">
-         <property name="toolTip">
-          <string>Attatch data file</string>
-         </property>
-         <property name="text">
-          <string>Data File(s)**</string>
-         </property>
-         <property name="buddy">
-          <cstring>fileEdit</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="dateLbl">
-         <property name="toolTip">
-          <string>When was this data collected?</string>
-         </property>
-         <property name="text">
-          <string>Date Collected**</string>
-         </property>
-         <property name="buddy">
-          <cstring>dateSelect</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="5">
-        <widget class="QLabel" name="requiredLbl">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>fields marked with a ** are required</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="3" colspan="3">
-        <widget class="QLineEdit" name="nameEdit"/>
-       </item>
-       <item row="10" column="4" colspan="2">
-        <widget class="QPushButton" name="fileBtn">
-         <property name="text">
-          <string>Browse</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="3" colspan="3">
-        <widget class="QComboBox" name="subsystemDrop"/>
-       </item>
-       <item row="7" column="3" colspan="3">
-        <widget class="QLineEdit" name="projectEdit"/>
-       </item>
-       <item row="8" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="tagLbl">
          <property name="toolTip">
           <string>Tags for data, separate with commas</string>
@@ -706,27 +582,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="3" colspan="3">
-        <widget class="QComboBox" name="carDrop">
-         <property name="editable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="carLbl">
-         <property name="toolTip">
-          <string>What car was this data collected with/for?</string>
-         </property>
-         <property name="text">
-          <string>Car Name</string>
-         </property>
-         <property name="buddy">
-          <cstring>carDrop</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="projectLbl">
          <property name="toolTip">
           <string>What project is this for?</string>
@@ -739,7 +595,184 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="3" colspan="3">
+       <item row="4" column="0">
+        <widget class="QLabel" name="collectorLbl">
+         <property name="toolTip">
+          <string>Who Collected the data?</string>
+         </property>
+         <property name="text">
+          <string>Collector</string>
+         </property>
+         <property name="buddy">
+          <cstring>collectorEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="subsystemLbl">
+         <property name="toolTip">
+          <string>What team subgroup is this for?</string>
+         </property>
+         <property name="text">
+          <string>Subsystem</string>
+         </property>
+         <property name="buddy">
+          <cstring>subsystemDrop</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="descriptionLbl">
+         <property name="toolTip">
+          <string>What is this data?</string>
+         </property>
+         <property name="text">
+          <string>Description</string>
+         </property>
+         <property name="buddy">
+          <cstring>descriptionEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="carLbl">
+         <property name="toolTip">
+          <string>What car was this data collected with/for?</string>
+         </property>
+         <property name="text">
+          <string>Car Name</string>
+         </property>
+         <property name="buddy">
+          <cstring>carDrop</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="dateLbl">
+         <property name="toolTip">
+          <string>When was this data collected?</string>
+         </property>
+         <property name="text">
+          <string>Date Collected</string>
+         </property>
+         <property name="buddy">
+          <cstring>dateSelect</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="nameLbl">
+         <property name="toolTip">
+          <string>Name for the data</string>
+         </property>
+         <property name="text">
+          <string>Name</string>
+         </property>
+         <property name="buddy">
+          <cstring>nameEdit</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="QCheckBox" name="projectCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QCheckBox" name="subsystemCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QCheckBox" name="nameCheck">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>18</width>
+           <height>18</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2">
+        <widget class="QCheckBox" name="tagCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" rowspan="8">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="2">
+        <widget class="QCheckBox" name="carCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QCheckBox" name="collectorCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="2">
+        <widget class="QCheckBox" name="descCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" rowspan="8">
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="1" colspan="3">
+        <widget class="QLabel" name="enableLbl">
+         <property name="text">
+          <string>Filter by:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4">
         <widget class="QDateEdit" name="dateSelect">
          <property name="displayFormat">
           <string>MM/dd/yyyy</string>
@@ -749,23 +782,55 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="3" colspan="3">
-        <widget class="QPlainTextEdit" name="descriptionEdit">
-         <property name="tabChangesFocus">
-          <bool>true</bool>
+       <item row="1" column="4">
+        <widget class="QLineEdit" name="nameEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="readOnly">
-          <bool>false</bool>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
         </widget>
        </item>
-       <item row="8" column="3" colspan="3">
+       <item row="3" column="4">
+        <widget class="QComboBox" name="carDrop">
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4">
+        <widget class="QLineEdit" name="collectorEdit"/>
+       </item>
+       <item row="5" column="4">
+        <widget class="QComboBox" name="subsystemDrop"/>
+       </item>
+       <item row="6" column="4">
+        <widget class="QLineEdit" name="projectEdit"/>
+       </item>
+       <item row="7" column="4">
         <widget class="QPlainTextEdit" name="tagEdit">
          <property name="tabChangesFocus">
           <bool>true</bool>
          </property>
          <property name="placeholderText">
           <string>Tags, separated with commas</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="4">
+        <widget class="QPlainTextEdit" name="descriptionEdit">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -784,9 +849,7 @@
   <tabstop>projectEdit</tabstop>
   <tabstop>tagEdit</tabstop>
   <tabstop>descriptionEdit</tabstop>
-  <tabstop>fileEdit</tabstop>
-  <tabstop>fileBtn</tabstop>
-  <tabstop>submitBtn</tabstop>
+  <tabstop>searchBtn</tabstop>
   <tabstop>cancelBtn</tabstop>
   <tabstop>scrollArea</tabstop>
  </tabstops>

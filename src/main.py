@@ -5,7 +5,7 @@ from typing import List
 import PyQt5.QtSql
 import sys
 import shutil
-import mainUI, detailsUI, editUI, tableUI
+import mainUI, detailsUI, editUI, tableUI, filterUI
 import sqlite3
 import uuid
 import pickle
@@ -93,6 +93,8 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
         self.populateTable()
 
     def populateTable(self, rows = []):
+        print('populating!')
+        self.tableWidget.setRowCount(0)
         if not rows:
             cursor = CONNECTION.cursor()
             cursor.execute('''SELECT * FROM baja_test_table ''')
@@ -128,6 +130,8 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
     def dataDetails(self):
         data = []
         rowNum = self.tableWidget.currentRow()
+        if rowNum == -1:
+            rowNum = 0
         cursor = CONNECTION.cursor()
         dataId = self.tableWidget.item(rowNum, 9).text()
         cursor.execute('SELECT * FROM baja_test_table WHERE dataID=?;', (dataId,))
@@ -135,15 +139,13 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
         for item in row:
             data.append(item)
         data[9] = pickle.loads(data[9])
-        dialog = DetailsWindow(data)
+        dialog = DetailsWindow(data = data, parent = self)
         dialog.show()
         dialog.exec_()
-        self.tableWidget.setRowCount(0)
-        self.populateTable()
 
 
     def filterData(self):
-        dialog = EditWindow(filtering = True)
+        dialog = FilterWindow(parent = self)
         dialog.show()
         dialog.exec_()
 
@@ -183,6 +185,7 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
             cursor = CONNECTION.cursor()
             cursor.execute('DELETE FROM baja_test_table where dataID=?;', (self.dataId,))
             CONNECTION.commit()
+            self.parent().populateTable()
             self.cancelButton()
 
 
@@ -191,6 +194,7 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         dialog = EditWindow(self.data)
         dialog.show()
         dialog.exec_()
+        self.parent().populateTable()
         self.updateWindow()
 
 
@@ -253,13 +257,13 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
                     'Other']
     fileNames = []
 
-    def __init__(self, data = [], filtering = False, parent=None):
+    def __init__(self, data = [], parent=None):
         super(EditWindow, self).__init__(parent)
         self.setupUi(self)
         self.fileNames = []
         self.data = data
         self.newData = False
-        if not data and not filtering:
+        if not data:
             self.newData = True
 
         self.cancelBtn.clicked.connect(self.cancelButton)
@@ -268,16 +272,7 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         self.subsystemDrop.addItems(self.subsystemList)
         self.dateSelect.setDate(QDate.currentDate())
 
-        if filtering:
-            self.submitBtn.setText('Filter')
-            self.requiredLbl.setText('')
-            self.nameLbl.setText('Name')
-            self.dateLbl.setText('Date Collected')
-            self.subsystemLbl.setText('Subsystem')
-            self.descriptionLbl.setText('Description')
-            self.fileLbl.setText('Data File(s)')
-            self.submitBtn.clicked.connect(self.filterData)
-        elif self.newData:
+        if self.newData:
             self.submitBtn.clicked.connect(self.submitAddData)
         else:
             self.submitBtn.clicked.connect(self.submitEditData)
@@ -374,6 +369,79 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
             confirm = msg.exec_()
 
 
+    def cancelButton(self):
+        self.reject()
+
+
+
+class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
+    carList = ['',
+                'j-arm',
+                'semi',
+                'r15',
+                'r16',
+                'r17',
+                'r18',
+                'r19',
+                'r20']
+    subsystemList = ['',
+                    'Frame',
+                    'Suspension',
+                    'Steering',
+                    'Outboard',
+                    'Brakes',
+                    'Ergonomics',
+                    'Reduction',
+                    'CVT',
+                    'Electrical',
+                    'R&D',
+                    'Manufacturing',
+                    'Engine',
+                    'Composites',
+                    'Driveline Integration',
+                    'Eboard',
+                    'Other']
+    filters = []
+
+    def __init__(self, data = [], parent=None):
+        super(FilterWindow, self).__init__(parent)
+        self.setupUi(self)
+        self.data = data
+        self.cancelBtn.clicked.connect(self.cancelButton)
+        self.searchBtn.clicked.connect(self.filterData)
+        self.carDrop.addItems(self.carList)
+        self.subsystemDrop.addItems(self.subsystemList)
+        self.dateSelect.setDate(QDate.currentDate())
+
+        self.nameCheck.setCheckState(0)
+        self.dateCheck.setCheckState(0)
+        self.carCheck.setCheckState(0)
+        self.collectorCheck.setCheckState(0)
+        self.subsystemCheck.setCheckState(0)
+        self.projectCheck.setCheckState(0)
+        self.tagCheck.setCheckState(0)
+        self.descCheck.setCheckState(0)
+
+        self.nameEdit.setDisabled(True)
+        self.dateSelect.setDisabled(True)
+        self.carDrop.setDisabled(True)
+        self.collectorEdit.setDisabled(True)
+        self.subsystemDrop.setDisabled(True)
+        self.projectEdit.setDisabled(True)
+        self.tagEdit.setDisabled(True)
+        self.descriptionEdit.setDisabled(True)
+
+        self.nameCheck.stateChanged.connect(self.nameChange)
+        self.dateCheck.stateChanged.connect(self.dateChange)
+        self.carCheck.stateChanged.connect(self.carChange)
+        self.collectorCheck.stateChanged.connect(self.collectChange)
+        self.subsystemCheck.stateChanged.connect(self.subChange)
+        self.projectCheck.stateChanged.connect(self.projChange)
+        self.tagCheck.stateChanged.connect(self.tagChange)
+        self.descCheck.stateChanged.connect(self.descChange)
+        self.filters = [0,0,0,0,0,0,0,0]
+
+
     def filterData(self):
         params = []
         params.append(self.nameEdit.text().lower())
@@ -384,14 +452,122 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         params.append(self.projectEdit.text().lower())
         params.append(self.tagEdit.toPlainText().lower())
         params.append(self.descriptionEdit.toPlainText().lower())
-        searchStrStart = "SELECT FROM baja_test_table WHERE"
+        searchStrStart = "SELECT * FROM baja_test_table WHERE"
+        searchStrs = []
+        results = []
 
-        #TODO: finish search functionality
+        for i in range(0,8):
+            if params[i] and self.filters[i]:
+                if i == 6 or i == 7:
+                    searchStrs.append(f"{DB_COLS[i+1]} = '%{params[i]}%'")
+                else:
+                    searchStrs.append(f"{DB_COLS[i+1]} = '{params[i]}'")
+
+        if searchStrs:
+            searchStr = f"{searchStrStart} {', AND '.join(searchStrs)};"
+            print(searchStr)
+            cursor = CONNECTION.cursor()
+            cursor.execute(searchStr)
+            results = cursor.fetchall()
+
+        if results:
+            self.parent().populateTable(rows = results)
+        elif not searchStrs:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("No Filters Selected!")
+            msg.setText("No filters were input")
+            confirm = msg.exec_()
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("No Results Found!")
+            msg.setText("No results were found using these filters")
+            confirm = msg.exec_()
+
+
+    def nameChange(self):
+        state = self.nameCheck.checkState()
+        if state == 2:
+            self.nameEdit.setDisabled(False)
+            self.filters[0] = 1
+        else:
+            self.nameEdit.setDisabled(True)
+            self.filters[0] = 0
+
+
+    def dateChange(self):
+        state = self.dateCheck.checkState()
+        if state == 2:
+            self.dateSelect.setDisabled(False)
+            self.filters[1] = 1
+        else:
+            self.dateSelect.setDisabled(True)
+            self.filters[1] = 0
+
+
+    def carChange(self):
+        state = self.carCheck.checkState()
+        if state == 2:
+            self.carDrop.setDisabled(False)
+            self.filters[2] = 1
+        else:
+            self.carDrop.setDisabled(True)
+            self.filters[2] = 0
+
+
+    def collectChange(self):
+        state = self.collectorCheck.checkState()
+        if state == 2:
+            self.collectorEdit.setDisabled(False)
+            self.filters[3] = 1
+        else:
+            self.collectorEdit.setDisabled(True)
+            self.filters[3] = 0
+
+
+    def subChange(self):
+        state = self.subsystemCheck.checkState()
+        if state == 2:
+            self.subsystemDrop.setDisabled(False)
+            self.filters[4] = 1
+        else:
+            self.subsystemDrop.setDisabled(True)
+            self.filters[4] = 0
+
+
+    def projChange(self):
+        state = self.projectCheck.checkState()
+        if state == 2:
+            self.projectEdit.setDisabled(False)
+            self.filters[5] = 1
+        else:
+            self.projectEdit.setDisabled(True)
+            self.filters[5] = 0
+
+
+    def tagChange(self):
+        state = self.tagCheck.checkState()
+        if state == 2:
+            self.tagEdit.setDisabled(False)
+            self.filters[6] = 1
+        else:
+            self.tagEdit.setDisabled(True)
+            self.filters[6] = 0
+
+
+    def descChange(self):
+        state = self.descCheck.checkState()
+        if state == 2:
+            self.descriptionEdit.setDisabled(False)
+            self.filters[7] = 1
+        else:
+            self.descriptionEdit.setDisabled(True)
+            self.filters[7] = 0
 
 
     def cancelButton(self):
         self.reject()
-
 
 
 if __name__ == '__main__':
