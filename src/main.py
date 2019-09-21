@@ -3,13 +3,14 @@ from PyQt5.QtCore import QSize, QDate
 from PyQt5.QtGui import QActionEvent
 from typing import List
 import PyQt5.QtSql
+import os
 import sys
 import shutil
 import mainUI, detailsUI, editUI, tableUI, filterUI
 import sqlite3
 import uuid
 import pickle
-import ipdb
+from config import STORAGE, CARS_LIST, SUBSYSTEMS_LIST
 
 '''
 cd C:\\Users\\Caitlin\\Documents\\repositories\\personal code\
@@ -38,7 +39,18 @@ def shortFileNames(files):
 def listToStr(files):
     return ', '.join(files)
 
-
+def checkStorage():
+    if not os.path.isdir(STORAGE):
+        return(False)
+    else:
+        folders = []
+        for _, dirs, _ in os.walk(STORAGE):
+            for name in dirs:
+                folders.append(name)
+        for system in SUBSYSTEMS_LIST:
+            if system not in folders:
+                os.mkdir(os.path.join(STORAGE, system))
+        return(True)
 
 class MainApp(QMainWindow, mainUI.Ui_MainWindow):
 
@@ -50,6 +62,13 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
         self.viewBtn.clicked.connect(self.viewData)
 
         self.setUpDatabase()
+        if not checkStorage():
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("Storage Path Error")
+            msg.setText("ERROR: Please check the path to the data storage directory")
+            msg.exec_()
+            sys.exit()
 
 
     def addData(self):
@@ -90,10 +109,10 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
         self.detailsBtn.clicked.connect(self.dataDetails)
         self.tableWidget.cellDoubleClicked.connect(self.dataDetails)
         self.filterBtn.clicked.connect(self.filterData)
+        self.resetBtn.clicked.connect(self.populateTable)
         self.populateTable()
 
     def populateTable(self, rows = []):
-        print('populating!')
         self.tableWidget.setRowCount(0)
         if not rows:
             cursor = CONNECTION.cursor()
@@ -229,32 +248,6 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
 
 
 class EditWindow(QDialog, editUI.Ui_EditWindow):
-    carList = ['',
-                'j-arm',
-                'semi',
-                'r15',
-                'r16',
-                'r17',
-                'r18',
-                'r19',
-                'r20']
-    subsystemList = ['',
-                    'Frame',
-                    'Suspension',
-                    'Steering',
-                    'Outboard',
-                    'Brakes',
-                    'Ergonomics',
-                    'Reduction',
-                    'CVT',
-                    'Electrical',
-                    'R&D',
-                    'Manufacturing',
-                    'Engine',
-                    'Composites',
-                    'Driveline Integration',
-                    'Eboard',
-                    'Other']
     fileNames = []
 
     def __init__(self, data = [], parent=None):
@@ -268,8 +261,10 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
 
         self.cancelBtn.clicked.connect(self.cancelButton)
         self.fileBtn.clicked.connect(self.fileSelect)
-        self.carDrop.addItems(self.carList)
-        self.subsystemDrop.addItems(self.subsystemList)
+        cars = ['Select a Car'] + CARS_LIST
+        self.carDrop.addItems(cars)
+        subs = ['Select a Subsystem'] + SUBSYSTEMS_LIST
+        self.subsystemDrop.addItems(subs)
         self.dateSelect.setDate(QDate.currentDate())
 
         if self.newData:
@@ -311,9 +306,12 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         description = self.descriptionEdit.toPlainText().lower()
         files = pickle.dumps(self.fileNames)
 
-        if name and date and subsystem and description and self.fileNames:
+        if car == 'Select a Car':
+            car = ''
+
+        if name and date and (subsystem != 'Select a Subsystem') and description and self.fileNames:
             data_id = str(uuid.uuid4()).replace('-','')
-            print(f"data to submit \nid: {data_id}\nname: {name}\ndate: {date}\ncar: {car}\ncollector: {collector}\nsubsytem: {subsystem}\nproject: {project}\ntags: {tags}\ndesc: {description}\nfiles: {files}")
+
 
             cursor = CONNECTION.cursor()
             insertCommand = 'INSERT INTO baja_test_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'
@@ -348,11 +346,16 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
 
         cursor = CONNECTION.cursor()
 
-        if newData[1] and newData[2] and newData[5] and newData[8] and newData[9]:
+        if newData[3] == 'Select a Car':
+            newData[3] = self.data[3]
+
+        if newData[1] and newData[2] and (newData[5] != 'Select a Subsystem') and newData[8] and newData[9]:
             for i in range (1,9):
                 if newData[i] != self.data[i]:
+
                     updateStr = f"{updateStrStart} {DB_COLS[i]} = '{newData[i]}' WHERE dataID = '{self.data[0]}';"
                     cursor.execute(updateStr)
+
             if self.fileNames != self.data[9]:
                 updateStr = f"{updateStrStart} {DB_COLS[9]} = ? WHERE dataID = '{self.data[0]}';"
                 cursor.execute(updateStr, (pickle.dumps(newData[9]),))
@@ -375,32 +378,6 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
 
 
 class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
-    carList = ['',
-                'j-arm',
-                'semi',
-                'r15',
-                'r16',
-                'r17',
-                'r18',
-                'r19',
-                'r20']
-    subsystemList = ['',
-                    'Frame',
-                    'Suspension',
-                    'Steering',
-                    'Outboard',
-                    'Brakes',
-                    'Ergonomics',
-                    'Reduction',
-                    'CVT',
-                    'Electrical',
-                    'R&D',
-                    'Manufacturing',
-                    'Engine',
-                    'Composites',
-                    'Driveline Integration',
-                    'Eboard',
-                    'Other']
     filters = []
 
     def __init__(self, data = [], parent=None):
@@ -409,8 +386,10 @@ class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
         self.data = data
         self.cancelBtn.clicked.connect(self.cancelButton)
         self.searchBtn.clicked.connect(self.filterData)
-        self.carDrop.addItems(self.carList)
-        self.subsystemDrop.addItems(self.subsystemList)
+        cars = ['Select a Car'] + CARS_LIST
+        self.carDrop.addItems(cars)
+        subs = ['Select a Subsystem'] + SUBSYSTEMS_LIST
+        self.subsystemDrop.addItems(subs)
         self.dateSelect.setDate(QDate.currentDate())
 
         self.nameCheck.setCheckState(0)
@@ -458,14 +437,13 @@ class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
 
         for i in range(0,8):
             if params[i] and self.filters[i]:
-                if i == 6 or i == 7:
-                    searchStrs.append(f"{DB_COLS[i+1]} = '%{params[i]}%'")
-                else:
+                if i == 1 or i == 2 or i == 4:
                     searchStrs.append(f"{DB_COLS[i+1]} = '{params[i]}'")
+                else:
+                    searchStrs.append(f"{DB_COLS[i+1]} LIKE '%{params[i]}%'")
 
         if searchStrs:
-            searchStr = f"{searchStrStart} {', AND '.join(searchStrs)};"
-            print(searchStr)
+            searchStr = f"{searchStrStart} {' AND '.join(searchStrs)};"
             cursor = CONNECTION.cursor()
             cursor.execute(searchStr)
             results = cursor.fetchall()

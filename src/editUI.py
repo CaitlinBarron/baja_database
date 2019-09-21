@@ -250,7 +250,7 @@ class Ui_EditWindow(object):
         self.tagLbl.setObjectName("tagLbl")
         self.gridLayout_2.addWidget(self.tagLbl, 8, 0, 1, 1)
         self.carDrop = QtWidgets.QComboBox(self.scrollAreaWidgetContents)
-        self.carDrop.setEditable(True)
+        self.carDrop.setEditable(False)
         self.carDrop.setObjectName("carDrop")
         self.gridLayout_2.addWidget(self.carDrop, 4, 3, 1, 3)
         self.carLbl = QtWidgets.QLabel(self.scrollAreaWidgetContents)
