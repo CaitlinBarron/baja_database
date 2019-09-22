@@ -32,9 +32,16 @@ def strToList(tags):
 def shortFileNames(files):
     filesShort = []
     for file in files:
-        filesShort.append(file.split('/')[-1])
+        splitStr = file.split('/')[-1]
+        filesShort.append(splitStr.split('\\')[-1])
 
     return filesShort
+
+
+def getShortName(file):
+    splitStr = file.split('/')[-1]
+    return(splitStr.split('\\')[-1])
+
 
 def listToStr(files):
     return ', '.join(files)
@@ -87,7 +94,7 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
         #C:\Users\Caitlin\Documents\repositories\personal code\baja_database\src\baja_data.db
 
         cursor = CONNECTION.cursor()
-        cursor.execute("""CREATE TABLE if not exists "baja_test_table" (
+        cursor.execute("""CREATE TABLE if not exists "baja_data_table" (
                     "dataID"        TEXT,
                     "name"          TEXT NOT NULL,
                     "date"          TEXT NOT NULL,
@@ -116,7 +123,7 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
         self.tableWidget.setRowCount(0)
         if not rows:
             cursor = CONNECTION.cursor()
-            cursor.execute('''SELECT * FROM baja_test_table ''')
+            cursor.execute('''SELECT * FROM baja_data_table ''')
             rows = cursor.fetchall()
 
         self.tableWidget.setColumnCount(10)
@@ -153,7 +160,7 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
             rowNum = 0
         cursor = CONNECTION.cursor()
         dataId = self.tableWidget.item(rowNum, 9).text()
-        cursor.execute('SELECT * FROM baja_test_table WHERE dataID=?;', (dataId,))
+        cursor.execute('SELECT * FROM baja_data_table WHERE dataID=?;', (dataId,))
         row = cursor.fetchall()[0]
         for item in row:
             data.append(item)
@@ -201,9 +208,13 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirm = msg.exec_()
         if confirm == QMessageBox.Yes:
+            for file in self.data[9]:
+                os.remove(file)
+
             cursor = CONNECTION.cursor()
-            cursor.execute('DELETE FROM baja_test_table where dataID=?;', (self.dataId,))
+            cursor.execute('DELETE FROM baja_data_table where dataID=?;', (self.dataId,))
             CONNECTION.commit()
+
             self.parent().populateTable()
             self.cancelButton()
 
@@ -218,13 +229,21 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
 
 
     def copyData(self):
-        print("save a copy of this data")
-        #TODO: ALL OF THIS
+        saveLocation = QFileDialog()
+        options = QFileDialog.Options()
+        options |= QFileDialog.ShowDirsOnly
+        location = QFileDialog.getExistingDirectory(self,"Select where to save a copy", options=options)
+        if location:
+            for file in self.data[9]:
+                short = getShortName(file)
+                newPath = os.path.join(location, short)
+                shutil.copyfile(file, newPath)
+            self.cancelButton()
 
 
     def updateWindow(self):
         cursor = CONNECTION.cursor()
-        cursor.execute('SELECT * FROM baja_test_table WHERE dataID=?;', (self.dataId,))
+        cursor.execute('SELECT * FROM baja_data_table WHERE dataID=?;', (self.dataId,))
         newData = cursor.fetchall()[0]
         for i in range(0,10):
             self.data[i] = newData[i]
@@ -288,8 +307,7 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
 
     def fileSelect(self):
         options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
-        files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*);;Python Files (*.py)", options=options)
+        files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*)", options=options)
         if files:
             self.fileNames = files
             self.fileEdit.setText(listToStr(shortFileNames(files)))
@@ -304,7 +322,7 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         project = self.projectEdit.text().lower()
         tags = self.tagEdit.toPlainText().lower()
         description = self.descriptionEdit.toPlainText().lower()
-        files = pickle.dumps(self.fileNames)
+        movedFiles = []
 
         if car == 'Select a Car':
             car = ''
@@ -312,15 +330,17 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         if name and date and (subsystem != 'Select a Subsystem') and description and self.fileNames:
             data_id = str(uuid.uuid4()).replace('-','')
 
+            for filename in self.fileNames:
+                path = os.path.join(STORAGE,subsystem, getShortName(filename))
+                shutil.copyfile(filename, path)
+                movedFiles.append(path)
 
+            movedBytes = pickle.dumps(movedFiles)
             cursor = CONNECTION.cursor()
-            insertCommand = 'INSERT INTO baja_test_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'
-            newData = (data_id, name, date, car, collector, subsystem, project, tags, description, files)
+            insertCommand = 'INSERT INTO baja_data_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'
+            newData = (data_id, name, date, car, collector, subsystem, project, tags, description, movedBytes)
             cursor.execute(insertCommand, newData)
             CONNECTION.commit()
-
-            #TODO: copy new files into right place in storage
-
             self.cancelButton()
         else:
             msg = QMessageBox()
@@ -331,7 +351,7 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
 
 
     def submitEditData(self):
-        updateStrStart = "UPDATE baja_test_table SET"
+        updateStrStart = "UPDATE baja_data_table SET"
         newData = []
         newData.append(self.data[0])
         newData.append(self.nameEdit.text().lower())
@@ -346,21 +366,53 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
 
         cursor = CONNECTION.cursor()
 
+        oldSub = self.data[5]
+
         if newData[3] == 'Select a Car':
             newData[3] = self.data[3]
 
         if newData[1] and newData[2] and (newData[5] != 'Select a Subsystem') and newData[8] and newData[9]:
-            for i in range (1,9):
+            for i in [1, 2, 3, 4, 6, 7, 8]:
                 if newData[i] != self.data[i]:
 
                     updateStr = f"{updateStrStart} {DB_COLS[i]} = '{newData[i]}' WHERE dataID = '{self.data[0]}';"
                     cursor.execute(updateStr)
 
             if self.fileNames != self.data[9]:
-                updateStr = f"{updateStrStart} {DB_COLS[9]} = ? WHERE dataID = '{self.data[0]}';"
-                cursor.execute(updateStr, (pickle.dumps(newData[9]),))
+                movedFiles = []
+                for filename in self.fileNames:
+                    path = os.path.join(STORAGE, self.data[5], getShortName(filename))
 
-                #TODO: replace old files in storage with the new files
+                    shutil.copyfile(filename, path)
+                    movedFiles.append(path)
+
+                for file in self.data[9]:
+                    os.remove(file)
+
+                movedBytes = pickle.dumps(movedFiles)
+                updateStr = f"{updateStrStart} {DB_COLS[9]} = ? WHERE dataID = '{self.data[0]}';"
+                cursor.execute(updateStr, (movedBytes,))
+                self.data[9] = movedFiles
+
+            if newData[5] != self.data[5]:
+                movedFiles = []
+                for filename in self.fileNames:
+                    path = os.path.join(STORAGE, newData[5], getShortName(filename))
+
+                    shutil.copyfile(filename, path)
+                    movedFiles.append(path)
+
+                for file in self.data[9]:
+                    os.remove(file)
+
+                movedBytes = pickle.dumps(movedFiles)
+                updateStr = f"{updateStrStart} {DB_COLS[5]} = ? WHERE dataID = '{self.data[0]}';"
+                cursor.execute(updateStr, (newData[5],))
+
+                updateStr = f"{updateStrStart} {DB_COLS[9]} = ? WHERE dataID = '{self.data[0]}';"
+                cursor.execute(updateStr, (movedBytes,))
+
+
 
             CONNECTION.commit()
             self.cancelButton()
@@ -431,7 +483,7 @@ class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
         params.append(self.projectEdit.text().lower())
         params.append(self.tagEdit.toPlainText().lower())
         params.append(self.descriptionEdit.toPlainText().lower())
-        searchStrStart = "SELECT * FROM baja_test_table WHERE"
+        searchStrStart = "SELECT * FROM baja_data_table WHERE"
         searchStrs = []
         results = []
 
