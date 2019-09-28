@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainUI.ui'
+# Form implementation generated from reading ui file '.\mainUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -14,8 +13,8 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(600, 250)
-        MainWindow.setMinimumSize(QtCore.QSize(365, 165))
+        MainWindow.resize(300, 100)
+        MainWindow.setMinimumSize(QtCore.QSize(300, 100))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -189,3 +188,5 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "RIT Baja Database"))
         self.addBtn.setText(_translate("MainWindow", "Add Data"))
         self.viewBtn.setText(_translate("MainWindow", "View Data"))
+
+

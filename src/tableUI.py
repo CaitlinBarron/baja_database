@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'tableUI.ui'
+# Form implementation generated from reading ui file '.\tableUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -13,7 +12,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_TableWindow(object):
     def setupUi(self, TableWindow):
         TableWindow.setObjectName("TableWindow")
-        TableWindow.resize(1500, 700)
+        TableWindow.resize(600, 300)
+        TableWindow.setMinimumSize(QtCore.QSize(500, 200))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -203,3 +203,5 @@ class Ui_TableWindow(object):
         self.filterBtn.setText(_translate("TableWindow", "Filter Data"))
         self.detailsBtn.setText(_translate("TableWindow", "Data Details"))
         self.resetBtn.setText(_translate("TableWindow", "Reset"))
+
+

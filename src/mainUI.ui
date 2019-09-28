@@ -9,14 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>250</height>
+    <width>300</width>
+    <height>100</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>365</width>
-    <height>165</height>
+    <width>300</width>
+    <height>100</height>
    </size>
   </property>
   <property name="palette">

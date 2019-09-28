@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'detailsUI.ui'
+# Form implementation generated from reading ui file '.\detailsUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -13,13 +12,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_DetailsWindow(object):
     def setupUi(self, DetailsWindow):
         DetailsWindow.setObjectName("DetailsWindow")
-        DetailsWindow.resize(1100, 1150)
+        DetailsWindow.resize(600, 550)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(DetailsWindow.sizePolicy().hasHeightForWidth())
         DetailsWindow.setSizePolicy(sizePolicy)
-        DetailsWindow.setMinimumSize(QtCore.QSize(750, 0))
+        DetailsWindow.setMinimumSize(QtCore.QSize(500, 500))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -209,7 +208,7 @@ class Ui_DetailsWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1080, 749))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 582, 484))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_2.setObjectName("gridLayout_2")
@@ -325,3 +324,5 @@ class Ui_DetailsWindow(object):
         self.dateLbl.setText(_translate("DetailsWindow", "Date Collected"))
         self.fileLbl.setToolTip(_translate("DetailsWindow", "Attatch data file"))
         self.fileLbl.setText(_translate("DetailsWindow", "Data File(s)"))
+
+

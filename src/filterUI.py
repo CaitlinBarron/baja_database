@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'filterUI.ui'
+# Form implementation generated from reading ui file '.\filterUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.3
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -13,13 +12,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FilterWindow(object):
     def setupUi(self, FilterWindow):
         FilterWindow.setObjectName("FilterWindow")
-        FilterWindow.resize(1100, 1000)
+        FilterWindow.resize(600, 550)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(FilterWindow.sizePolicy().hasHeightForWidth())
         FilterWindow.setSizePolicy(sizePolicy)
-        FilterWindow.setMinimumSize(QtCore.QSize(750, 0))
+        FilterWindow.setMinimumSize(QtCore.QSize(500, 500))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -184,6 +183,7 @@ class Ui_FilterWindow(object):
         self.horizontalLayout.addItem(spacerItem2)
         self.gridLayout.addLayout(self.horizontalLayout, 3, 0, 1, 1)
         self.scrollArea = QtWidgets.QScrollArea(FilterWindow)
+        self.scrollArea.setMinimumSize(QtCore.QSize(0, 0))
         self.scrollArea.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.scrollArea.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.scrollArea.setFrameShadow(QtWidgets.QFrame.Plain)
@@ -194,7 +194,7 @@ class Ui_FilterWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1080, 649))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 582, 484))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_2.setObjectName("gridLayout_2")
@@ -350,3 +350,5 @@ class Ui_FilterWindow(object):
         self.enableLbl.setText(_translate("FilterWindow", "Filter by:"))
         self.dateSelect.setDisplayFormat(_translate("FilterWindow", "MM/dd/yyyy"))
         self.tagEdit.setPlaceholderText(_translate("FilterWindow", "Tags, separated with commas"))
+
+
