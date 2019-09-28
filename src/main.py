@@ -10,7 +10,6 @@ import mainUI, detailsUI, editUI, tableUI, filterUI
 import sqlite3
 import uuid
 import pickle
-from config import STORAGE, CARS_LIST, SUBSYSTEMS_LIST
 
 '''
 cd C:\\Users\\Caitlin\\Documents\\repositories\\personal code\
@@ -20,8 +19,16 @@ use 'pyuic5 filename.ui -o filename.py' to convert UI files
 '''
 
 CONNECTION = sqlite3.connect('baja_data.db')
+CONFIG = '.\\config.txt'
 DB_COLS = ["dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files"]
-
+STORAGE = ''
+CARS_LIST = []
+SUBSYSTEMS_LIST = []
+'''
+STORAGE = '..\\data_storage'
+CARS_LIST = ['j-arm', 'semi', 'r15', 'r16', 'r17', 'r18', 'r19', 'r20']
+SUBSYSTEMS_LIST = ['Brakes', 'Composites', 'CVT', 'Driveline Integration', 'Eboard', 'Electrical', 'Engine', 'Ergonomics', 'Frame', 'Manufacturing', 'Other', 'Outboard', 'R&D', 'Reduction', 'Steering', 'Suspension']
+'''
 
 def strToList(tags):
     tagsShort = []
@@ -29,12 +36,12 @@ def strToList(tags):
         tagsShort.append(tag.strip())
     return tagsShort
 
+
 def shortFileNames(files):
     filesShort = []
     for file in files:
         splitStr = file.split('/')[-1]
         filesShort.append(splitStr.split('\\')[-1])
-
     return filesShort
 
 
@@ -45,6 +52,7 @@ def getShortName(file):
 
 def listToStr(files):
     return ', '.join(files)
+
 
 def checkStorage():
     if not os.path.isdir(STORAGE):
@@ -59,6 +67,46 @@ def checkStorage():
                 os.mkdir(os.path.join(STORAGE, system))
         return(True)
 
+
+def checkConfig():
+    global STORAGE
+    global CARS_LIST
+    global SUBSYSTEMS_LIST
+
+    try:
+        configFile = open(CONFIG, "r")
+        lines = configFile.readlines()
+    except:
+        return(False)
+
+    stor = cars = subs = False
+    for line in lines:
+        if line[0] == '#':
+            stor = cars = subs = False
+        elif line == '[STORAGE]\n':
+            stor = True
+        elif line == '[CARS_LIST]\n':
+            cars = True
+        elif line == '[SUBSYSTEMS_LIST]\n':
+            subs = True
+        elif stor:
+            STORAGE = line.split('\n')[0]
+            stor = False
+        elif cars:
+            CARS_LIST.append(line.split('\n')[0])
+        elif subs:
+            SUBSYSTEMS_LIST.append(line.split('\n')[0])
+        else:
+            stor = cars = subs = False
+
+    if STORAGE and CARS_LIST and SUBSYSTEMS_LIST:
+        return(True)
+    else:
+        return(False)
+
+
+
+
 class MainApp(QMainWindow, mainUI.Ui_MainWindow):
 
     def __init__(self, parent=None):
@@ -67,6 +115,15 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
 
         self.addBtn.clicked.connect(self.addData)
         self.viewBtn.clicked.connect(self.viewData)
+
+        config = checkConfig()
+        if not config:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("Configuration Error")
+            msg.setText("ERROR: Please check the configuration file setup")
+            msg.exec_()
+            sys.exit()
 
         self.setUpDatabase()
         if not checkStorage():
@@ -159,15 +216,17 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
         if rowNum == -1:
             rowNum = 0
         cursor = CONNECTION.cursor()
-        dataId = self.tableWidget.item(rowNum, 9).text()
-        cursor.execute('SELECT * FROM baja_data_table WHERE dataID=?;', (dataId,))
-        row = cursor.fetchall()[0]
-        for item in row:
-            data.append(item)
-        data[9] = pickle.loads(data[9])
-        dialog = DetailsWindow(data = data, parent = self)
-        dialog.show()
-        dialog.exec_()
+        dataId = self.tableWidget.item(rowNum, 9)
+        if dataId:
+            dataId = dataId.text()
+            cursor.execute('SELECT * FROM baja_data_table WHERE dataID=?;', (dataId,))
+            row = cursor.fetchall()[0]
+            for item in row:
+                data.append(item)
+            data[9] = pickle.loads(data[9])
+            dialog = DetailsWindow(data = data, parent = self)
+            dialog.show()
+            dialog.exec_()
 
 
     def filterData(self):
