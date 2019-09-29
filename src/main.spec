@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['Z:\\Baja files\\## Measured Data\\baja_database\\baja_database\\src'],
+             pathex=['Z:\\## Measured Data\\baja_database\\src'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -30,4 +30,4 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True )
+          console=False )
