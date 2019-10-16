@@ -20,15 +20,11 @@ use 'pyuic5 filename.ui -o filename.py' to convert UI files
 
 CONNECTION = sqlite3.connect('baja_data.db')
 CONFIG = '.\\config.txt'
-DB_COLS = ["dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files"]
+DB_COLS = ["dataID", "name", "date", "car", "collector", "subsystem", "project", "testPlan", "tags", "description", "testPics", "files"]
 STORAGE = ''
 CARS_LIST = []
 SUBSYSTEMS_LIST = []
-'''
-STORAGE = '..\\data_storage'
-CARS_LIST = ['j-arm', 'semi', 'r15', 'r16', 'r17', 'r18', 'r19', 'r20']
-SUBSYSTEMS_LIST = ['Brakes', 'Composites', 'CVT', 'Driveline Integration', 'Eboard', 'Electrical', 'Engine', 'Ergonomics', 'Frame', 'Manufacturing', 'Other', 'Outboard', 'R&D', 'Reduction', 'Steering', 'Suspension']
-'''
+
 
 def strToList(tags):
     tagsShort = []
@@ -148,8 +144,6 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
 
 
     def setUpDatabase(self):
-        #C:\Users\Caitlin\Documents\repositories\personal code\baja_database\src\baja_data.db
-
         cursor = CONNECTION.cursor()
         cursor.execute("""CREATE TABLE if not exists "baja_data_table" (
                     "dataID"        TEXT,
@@ -159,8 +153,10 @@ class MainApp(QMainWindow, mainUI.Ui_MainWindow):
                     "collector"     TEXT,
                     "subsystem"     TEXT NOT NULL,
                     "project"       TEXT,
+                    "testPlan"      TEXT,
                     "tags"          TEXT,
                     "description"   TEXT NOT NULL,
+                    "testPics"      BLOB,
                     "files"         BLOB NOT NULL,
                     PRIMARY KEY("dataID"))""")
 
@@ -183,16 +179,20 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
             cursor.execute('''SELECT * FROM baja_data_table ''')
             rows = cursor.fetchall()
 
-        self.tableWidget.setColumnCount(10)
-        headerList = ['Name', 'Date', 'Car', 'Collector', 'Subsystem', 'Project', 'Tags', 'Description', 'Files', 'id']
+        self.tableWidget.setColumnCount(12)
+        headerList = ['Name', 'Date', 'Car', 'Collector', 'Subsystem', 'Project', 'Test Plan', 'Tags', 'Description', 'Testing Pics', 'Files', 'id']
         self.tableWidget.setHorizontalHeaderLabels(headerList)
 
         for row in rows:
             i = rows.index(row)
-            files = pickle.loads(row[9])
+            pics = pickle.loads(row[10])
+            shortFiles = shortFileNames(pics)
+            picStr = listToStr(shortFiles)
+
+            files = pickle.loads(row[11])
             shortFiles = shortFileNames(files)
-            filestr = listToStr(shortFiles)
-            name = row[1]
+            fileStr = listToStr(shortFiles)
+
             self.tableWidget.insertRow(i)
             self.tableWidget.setItem(i, 0, QTableWidgetItem(row[1]))
             self.tableWidget.setItem(i, 1, QTableWidgetItem(row[2]))
@@ -202,10 +202,12 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
             self.tableWidget.setItem(i, 5, QTableWidgetItem(row[6]))
             self.tableWidget.setItem(i, 6, QTableWidgetItem(row[7]))
             self.tableWidget.setItem(i, 7, QTableWidgetItem(row[8]))
-            self.tableWidget.setItem(i, 8, QTableWidgetItem(filestr))
-            self.tableWidget.setItem(i, 9, QTableWidgetItem(row[0]))
+            self.tableWidget.setItem(i, 8, QTableWidgetItem(row[9]))
+            self.tableWidget.setItem(i, 9, QTableWidgetItem(picStr))
+            self.tableWidget.setItem(i, 10, QTableWidgetItem(fileStr))
+            self.tableWidget.setItem(i, 11, QTableWidgetItem(row[0]))
 
-        self.tableWidget.setColumnHidden(9, True)
+        self.tableWidget.setColumnHidden(11, True)
         self.tableWidget.resizeColumnsToContents()
         self.tableWidget.showGrid()
 
@@ -216,14 +218,15 @@ class TableWindow(QDialog, tableUI.Ui_TableWindow):
         if rowNum == -1:
             rowNum = 0
         cursor = CONNECTION.cursor()
-        dataId = self.tableWidget.item(rowNum, 9)
+        dataId = self.tableWidget.item(rowNum, 11)
         if dataId:
             dataId = dataId.text()
             cursor.execute('SELECT * FROM baja_data_table WHERE dataID=?;', (dataId,))
             row = cursor.fetchall()[0]
             for item in row:
                 data.append(item)
-            data[9] = pickle.loads(data[9])
+            data[10] = pickle.loads(data[10])
+            data[11] = pickle.loads(data[11])
             dialog = DetailsWindow(data = data, parent = self)
             dialog.show()
             dialog.exec_()
@@ -254,9 +257,11 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         self.collectorDisp.setText(data[4])
         self.subsystemDisp.setText(data[5])
         self.projectDisp.setText(data[6])
-        self.tagDisp.setPlainText(data[7])
-        self.descriptionDisp.setPlainText(data[8])
-        self.fileDisp.setText(listToStr(shortFileNames(data[9])))
+        self.testDisp.setText(data[7])
+        self.tagDisp.setPlainText(data[8])
+        self.descriptionDisp.setPlainText(data[9])
+        self.picDisp.setText(listToStr(shortFileNames(data[10])))
+        self.fileDisp.setText(listToStr(shortFileNames(data[11])))
 
 
     def deleteData(self):
@@ -267,7 +272,9 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         confirm = msg.exec_()
         if confirm == QMessageBox.Yes:
-            for file in self.data[9]:
+            for file in self.data[10]:
+                os.remove(file)
+            for file in self.data[11]:
                 os.remove(file)
 
             cursor = CONNECTION.cursor()
@@ -279,7 +286,6 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
 
 
     def editData(self):
-        #pass this data along somehow
         dialog = EditWindow(self.data)
         dialog.show()
         dialog.exec_()
@@ -293,7 +299,11 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         options |= QFileDialog.ShowDirsOnly
         location = QFileDialog.getExistingDirectory(self,"Select where to save a copy", options=options)
         if location:
-            for file in self.data[9]:
+            for file in self.data[10]:
+                short = getShortName(file)
+                newPath = os.path.join(location, short)
+                shutil.copyfile(file, newPath)
+            for file in self.data[11]:
                 short = getShortName(file)
                 newPath = os.path.join(location, short)
                 shutil.copyfile(file, newPath)
@@ -304,9 +314,9 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         cursor = CONNECTION.cursor()
         cursor.execute('SELECT * FROM baja_data_table WHERE dataID=?;', (self.dataId,))
         newData = cursor.fetchall()[0]
-        for i in range(0,10):
+        for i in range(0,12):
             self.data[i] = newData[i]
-            if i == 9:
+            if i == 10 | i == 11:
                 self.data[i] = pickle.loads(self.data[i])
 
         self.nameDisp.setText(self.data[1])
@@ -315,9 +325,11 @@ class DetailsWindow(QDialog, detailsUI.Ui_DetailsWindow):
         self.collectorDisp.setText(self.data[4])
         self.subsystemDisp.setText(self.data[5])
         self.projectDisp.setText(self.data[6])
-        self.tagDisp.setPlainText(self.data[7])
-        self.descriptionDisp.setPlainText(self.data[8])
-        self.fileDisp.setText(listToStr(shortFileNames(self.data[9])))
+        self.testDisp.setText(self.data[7])
+        self.tagDisp.setPlainText(self.data[8])
+        self.descriptionDisp.setPlainText(self.data[9])
+        self.picDisp.setText(listToStr(shortFileNames(self.data[10])))
+        self.fileDisp.setText(listToStr(shortFileNames(self.data[11])))
 
 
     def cancelButton(self):
@@ -332,12 +344,14 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         super(EditWindow, self).__init__(parent)
         self.setupUi(self)
         self.fileNames = []
+        self.picNames = []
         self.data = data
         self.newData = False
         if not data:
             self.newData = True
 
         self.cancelBtn.clicked.connect(self.cancelButton)
+        self.picBtn.clicked.connect(self.picSelect)
         self.fileBtn.clicked.connect(self.fileSelect)
         cars = ['Select a Car'] + CARS_LIST
         self.carDrop.addItems(cars)
@@ -358,10 +372,21 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
             self.collectorEdit.setText(data[4])
             self.subsystemDrop.setCurrentText(data[5])
             self.projectEdit.setText(data[6])
-            self.tagEdit.setPlainText(data[7])
-            self.descriptionEdit.setPlainText(data[8])
-            self.fileNames = data[9]
-            self.fileEdit.setText(listToStr(shortFileNames(self.fileNames)))
+            self.testEdit.setText(data[7])
+            self.tagEdit.setPlainText(data[8])
+            self.descriptionEdit.setPlainText(data[9])
+            self.picNames = data[10]
+            self.picDisp.setText(listToStr(shortFileNames(self.picNames)))
+            self.fileNames = data[11]
+            self.fileDisp.setText(listToStr(shortFileNames(self.fileNames)))
+
+
+    def picSelect(self):
+        options = QFileDialog.Options()
+        files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","Image and Video (*.jpeg *.jpg *.png *.gif *.bmp *.tiff *.tif *.mov *.mp4 *.wmv *.avi *.m4v *.mpg *.mpeg);;All Files (*)", options=options)
+        if files:
+            self.picNames = files
+            self.picDisp.setText(listToStr(shortFileNames(files)))
 
 
     def fileSelect(self):
@@ -369,7 +394,7 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         files, _ = QFileDialog.getOpenFileNames(self,"QFileDialog.getOpenFileNames()", "","All Files (*)", options=options)
         if files:
             self.fileNames = files
-            self.fileEdit.setText(listToStr(shortFileNames(files)))
+            self.fileDisp.setText(listToStr(shortFileNames(files)))
 
 
     def submitAddData(self):
@@ -379,9 +404,11 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         collector = self.collectorEdit.text().lower()
         subsystem = self.subsystemDrop.currentText()
         project = self.projectEdit.text().lower()
+        testPlan = self.testEdit.text()
         tags = self.tagEdit.toPlainText().lower()
         description = self.descriptionEdit.toPlainText().lower()
         movedFiles = []
+        movedPics = []
 
         if car == 'Select a Car':
             car = ''
@@ -394,10 +421,16 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
                 shutil.copyfile(filename, path)
                 movedFiles.append(path)
 
-            movedBytes = pickle.dumps(movedFiles)
+            for pic in self.picNames:
+                path = os.path.join(STORAGE,subsystem, getShortName(pic))
+                shutil.copyfile(pic, path)
+                movedPics.append(path)
+
+            movedFileBytes = pickle.dumps(movedFiles)
+            movedPicBytes = pickle.dumps(movedPics)
             cursor = CONNECTION.cursor()
-            insertCommand = 'INSERT INTO baja_data_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "tags", "description", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'
-            newData = (data_id, name, date, car, collector, subsystem, project, tags, description, movedBytes)
+            insertCommand = 'INSERT INTO baja_data_table ("dataID", "name", "date", "car", "collector", "subsystem", "project", "testPlan", "tags", "description", "testPics", "files") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'
+            newData = (data_id, name, date, car, collector, subsystem, project, testPlan, tags, description, movedPicBytes, movedFileBytes)
             cursor.execute(insertCommand, newData)
             CONNECTION.commit()
             self.cancelButton()
@@ -430,14 +463,29 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
         if newData[3] == 'Select a Car':
             newData[3] = self.data[3]
 
-        if newData[1] and newData[2] and (newData[5] != 'Select a Subsystem') and newData[8] and newData[9]:
-            for i in [1, 2, 3, 4, 6, 7, 8]:
+        if newData[1] and newData[2] and (newData[5] != 'Select a Subsystem') and newData[9] and newData[11]:
+            for i in [1, 2, 3, 4, 6, 7, 8, 9]:
                 if newData[i] != self.data[i]:
-
                     updateStr = f"{updateStrStart} {DB_COLS[i]} = '{newData[i]}' WHERE dataID = '{self.data[0]}';"
                     cursor.execute(updateStr)
 
-            if self.fileNames != self.data[9]:
+            if self.picNames != self.data[10]:
+                movedPics = []
+                for pic in self.picNames:
+                    path = os.path.join(STORAGE, self.data[5], getShortName(pic))
+
+                    shutil.copyfile(pic, path)
+                    movedPics.append(path)
+
+                for file in self.data[10]:
+                    os.remove(file)
+
+                movedPicBytes = pickle.dumps(movedPics)
+                updateStr = f"{updateStrStart} {DB_COLS[10]} = ? WHERE dataID = '{self.data[0]}';"
+                cursor.execute(updateStr, (movedPicBytes,))
+                self.data[11] = movedPics
+
+            if self.fileNames != self.data[11]:
                 movedFiles = []
                 for filename in self.fileNames:
                     path = os.path.join(STORAGE, self.data[5], getShortName(filename))
@@ -445,33 +493,45 @@ class EditWindow(QDialog, editUI.Ui_EditWindow):
                     shutil.copyfile(filename, path)
                     movedFiles.append(path)
 
-                for file in self.data[9]:
+                for file in self.data[11]:
                     os.remove(file)
 
-                movedBytes = pickle.dumps(movedFiles)
-                updateStr = f"{updateStrStart} {DB_COLS[9]} = ? WHERE dataID = '{self.data[0]}';"
-                cursor.execute(updateStr, (movedBytes,))
-                self.data[9] = movedFiles
+                movedFileBytes = pickle.dumps(movedFiles)
+                updateStr = f"{updateStrStart} {DB_COLS[11]} = ? WHERE dataID = '{self.data[0]}';"
+                cursor.execute(updateStr, (movedFileBytes,))
+                self.data[11] = movedFiles
 
             if newData[5] != self.data[5]:
                 movedFiles = []
+                movedPics = []
                 for filename in self.fileNames:
                     path = os.path.join(STORAGE, newData[5], getShortName(filename))
 
                     shutil.copyfile(filename, path)
                     movedFiles.append(path)
 
-                for file in self.data[9]:
+                for pic in self.picNames:
+                    path = os.path.join(STORAGE, newData[5], getShortName(pic))
+
+                    shutil.copyfile(filename, path)
+                    movedPics.append(path)
+
+                for pic in self.data[10]:
+                    os.remove(pic)
+
+                for file in self.data[11]:
                     os.remove(file)
 
-                movedBytes = pickle.dumps(movedFiles)
+                movedFileBytes = pickle.dumps(movedFiles)
+                movedPicBytes = pickle.dumps(movedPics)
                 updateStr = f"{updateStrStart} {DB_COLS[5]} = ? WHERE dataID = '{self.data[0]}';"
                 cursor.execute(updateStr, (newData[5],))
 
-                updateStr = f"{updateStrStart} {DB_COLS[9]} = ? WHERE dataID = '{self.data[0]}';"
-                cursor.execute(updateStr, (movedBytes,))
+                updateStr = f"{updateStrStart} {DB_COLS[10]} = ? WHERE dataID = '{self.data[0]}';"
+                cursor.execute(updateStr, (movedPicBytes,))
 
-
+                updateStr = f"{updateStrStart} {DB_COLS[11]} = ? WHERE dataID = '{self.data[0]}';"
+                cursor.execute(updateStr, (movedFileBytes,))
 
             CONNECTION.commit()
             self.cancelButton()
@@ -509,6 +569,7 @@ class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
         self.collectorCheck.setCheckState(0)
         self.subsystemCheck.setCheckState(0)
         self.projectCheck.setCheckState(0)
+        self.testCheck.setCheckState(0)
         self.tagCheck.setCheckState(0)
         self.descCheck.setCheckState(0)
 
@@ -518,6 +579,7 @@ class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
         self.collectorEdit.setDisabled(True)
         self.subsystemDrop.setDisabled(True)
         self.projectEdit.setDisabled(True)
+        self.testEdit.setDisabled(True)
         self.tagEdit.setDisabled(True)
         self.descriptionEdit.setDisabled(True)
 
@@ -527,9 +589,10 @@ class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
         self.collectorCheck.stateChanged.connect(self.collectChange)
         self.subsystemCheck.stateChanged.connect(self.subChange)
         self.projectCheck.stateChanged.connect(self.projChange)
+        self.testCheck.stateChanged.connect(self.testChange)
         self.tagCheck.stateChanged.connect(self.tagChange)
         self.descCheck.stateChanged.connect(self.descChange)
-        self.filters = [0,0,0,0,0,0,0,0]
+        self.filters = [0,0,0,0,0,0,0,0,0]
 
 
     def filterData(self):
@@ -540,13 +603,14 @@ class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
         params.append(self.collectorEdit.text().lower())
         params.append(self.subsystemDrop.currentText())
         params.append(self.projectEdit.text().lower())
+        params.append(self.testEdit.text())
         params.append(self.tagEdit.toPlainText().lower())
         params.append(self.descriptionEdit.toPlainText().lower())
         searchStrStart = "SELECT * FROM baja_data_table WHERE"
         searchStrs = []
         results = []
 
-        for i in range(0,8):
+        for i in range(0,9):
             if params[i] and self.filters[i]:
                 if i == 1 or i == 2 or i == 4:
                     searchStrs.append(f"{DB_COLS[i+1]} = '{params[i]}'")
@@ -635,24 +699,34 @@ class FilterWindow(QDialog, filterUI.Ui_FilterWindow):
             self.filters[5] = 0
 
 
+    def testChange(self):
+        state = self.testCheck.checkState()
+        if state == 2:
+            self.testEdit.setDisabled(False)
+            self.filters[6] = 1
+        else:
+            self.testEdit.setDisabled(True)
+            self.filters[6] = 0
+
+
     def tagChange(self):
         state = self.tagCheck.checkState()
         if state == 2:
             self.tagEdit.setDisabled(False)
-            self.filters[6] = 1
+            self.filters[7] = 1
         else:
             self.tagEdit.setDisabled(True)
-            self.filters[6] = 0
+            self.filters[7] = 0
 
 
     def descChange(self):
         state = self.descCheck.checkState()
         if state == 2:
             self.descriptionEdit.setDisabled(False)
-            self.filters[7] = 1
+            self.filters[8] = 1
         else:
             self.descriptionEdit.setDisabled(True)
-            self.filters[7] = 0
+            self.filters[8] = 0
 
 
     def cancelButton(self):
