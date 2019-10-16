@@ -202,6 +202,6 @@ class Ui_TableWindow(object):
         TableWindow.setWindowTitle(_translate("TableWindow", "RIT Baja Database"))
         self.filterBtn.setText(_translate("TableWindow", "Filter Data"))
         self.detailsBtn.setText(_translate("TableWindow", "Data Details"))
-        self.resetBtn.setText(_translate("TableWindow", "Reset"))
+        self.resetBtn.setText(_translate("TableWindow", "Refresh"))
 
 

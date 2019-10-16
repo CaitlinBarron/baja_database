@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>550</height>
+    <width>592</width>
+    <height>518</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -560,8 +560,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>582</width>
-        <height>484</height>
+        <width>572</width>
+        <height>450</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -575,7 +575,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="tagLbl">
          <property name="toolTip">
           <string>Tags for data, separate with commas</string>
@@ -614,20 +614,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="subsystemLbl">
-         <property name="toolTip">
-          <string>What team subgroup is this for?</string>
-         </property>
-         <property name="text">
-          <string>Subsystem</string>
-         </property>
-         <property name="buddy">
-          <cstring>subsystemDrop</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="descriptionLbl">
          <property name="toolTip">
           <string>What is this data?</string>
@@ -637,19 +624,6 @@
          </property>
          <property name="buddy">
           <cstring>descriptionEdit</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="carLbl">
-         <property name="toolTip">
-          <string>What car was this data collected with/for?</string>
-         </property>
-         <property name="text">
-          <string>Car Name</string>
-         </property>
-         <property name="buddy">
-          <cstring>carDrop</cstring>
          </property>
         </widget>
        </item>
@@ -666,6 +640,32 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="carLbl">
+         <property name="toolTip">
+          <string>What car was this data collected with/for?</string>
+         </property>
+         <property name="text">
+          <string>Car Name</string>
+         </property>
+         <property name="buddy">
+          <cstring>carDrop</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="subsystemLbl">
+         <property name="toolTip">
+          <string>What team subgroup is this for?</string>
+         </property>
+         <property name="text">
+          <string>Subsystem</string>
+         </property>
+         <property name="buddy">
+          <cstring>subsystemDrop</cstring>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="nameLbl">
          <property name="toolTip">
@@ -679,15 +679,15 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
-        <widget class="QCheckBox" name="projectCheck">
+       <item row="5" column="2">
+        <widget class="QCheckBox" name="subsystemCheck">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
-        <widget class="QCheckBox" name="subsystemCheck">
+       <item row="6" column="2">
+        <widget class="QCheckBox" name="projectCheck">
          <property name="text">
           <string/>
          </property>
@@ -717,14 +717,41 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="2">
+       <item row="8" column="2">
         <widget class="QCheckBox" name="tagCheck">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" rowspan="8">
+       <item row="9" column="2">
+        <widget class="QCheckBox" name="descCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" colspan="3">
+        <widget class="QLabel" name="enableLbl">
+         <property name="text">
+          <string>Filter by:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" rowspan="9">
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="1" rowspan="9">
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -748,43 +775,6 @@
         <widget class="QCheckBox" name="collectorCheck">
          <property name="text">
           <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="2">
-        <widget class="QCheckBox" name="descCheck">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3" rowspan="8">
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="1" colspan="3">
-        <widget class="QLabel" name="enableLbl">
-         <property name="text">
-          <string>Filter by:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="4">
-        <widget class="QDateEdit" name="dateSelect">
-         <property name="displayFormat">
-          <string>MM/dd/yyyy</string>
-         </property>
-         <property name="calendarPopup">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -820,7 +810,27 @@
        <item row="6" column="4">
         <widget class="QLineEdit" name="projectEdit"/>
        </item>
-       <item row="7" column="4">
+       <item row="2" column="4">
+        <widget class="QDateEdit" name="dateSelect">
+         <property name="displayFormat">
+          <string>MM/dd/yyyy</string>
+         </property>
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="4">
+        <widget class="QPlainTextEdit" name="descriptionEdit">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="4">
         <widget class="QPlainTextEdit" name="tagEdit">
          <property name="tabChangesFocus">
           <bool>true</bool>
@@ -830,15 +840,22 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="4">
-        <widget class="QPlainTextEdit" name="descriptionEdit">
-         <property name="tabChangesFocus">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
+       <item row="7" column="0">
+        <widget class="QLabel" name="testLbl">
+         <property name="text">
+          <string>Test Plan</string>
          </property>
         </widget>
+       </item>
+       <item row="7" column="2">
+        <widget class="QCheckBox" name="testCheck">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="4">
+        <widget class="QLineEdit" name="testEdit"/>
        </item>
       </layout>
      </widget>

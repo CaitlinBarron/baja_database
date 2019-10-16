@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>550</height>
+    <width>500</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>500</width>
-    <height>500</height>
+    <height>600</height>
    </size>
   </property>
   <property name="palette">
@@ -606,11 +606,101 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>582</width>
-        <height>484</height>
+        <width>480</width>
+        <height>480</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
+       <item row="5" column="2">
+        <widget class="QLineEdit" name="subsystemDisp">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLineEdit" name="nameDisp">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="2">
+        <widget class="QPlainTextEdit" name="descriptionDisp">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="2">
+        <widget class="QLineEdit" name="fileDisp">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="subsystemLbl">
+         <property name="toolTip">
+          <string>What team subgroup is this for?</string>
+         </property>
+         <property name="text">
+          <string>Subsystem</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="descriptionLbl">
+         <property name="toolTip">
+          <string>What is this data?</string>
+         </property>
+         <property name="text">
+          <string>Description</string>
+         </property>
+         <property name="buddy">
+          <cstring>descriptionDisp</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="dateLbl">
+         <property name="toolTip">
+          <string>When was this data collected?</string>
+         </property>
+         <property name="text">
+          <string>Date Collected</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="fileLbl">
+         <property name="toolTip">
+          <string>Attatch data file</string>
+         </property>
+         <property name="text">
+          <string>Data File(s)</string>
+         </property>
+         <property name="buddy">
+          <cstring>fileDisp</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="nameLbl">
+         <property name="toolTip">
+          <string>Name for the data</string>
+         </property>
+         <property name="text">
+          <string>Name</string>
+         </property>
+         <property name="buddy">
+          <cstring>nameDisp</cstring>
+         </property>
+        </widget>
+       </item>
        <item row="6" column="0">
         <widget class="QLabel" name="projectLbl">
          <property name="toolTip">
@@ -624,7 +714,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="tagLbl">
          <property name="toolTip">
           <string>Tags for data, separate with commas</string>
@@ -634,6 +724,13 @@
          </property>
          <property name="buddy">
           <cstring>tagDisp</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="QLineEdit" name="projectDisp">
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -647,7 +744,20 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1" rowspan="9">
+       <item row="8" column="2">
+        <widget class="QPlainTextEdit" name="tagDisp">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="placeholderText">
+          <string>Tags, separated with commas</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" rowspan="11">
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -673,28 +783,8 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
-        <widget class="QLineEdit" name="projectDisp">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="2">
-        <widget class="QPlainTextEdit" name="tagDisp">
-         <property name="tabChangesFocus">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-         <property name="placeholderText">
-          <string>Tags, separated with commas</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="QLineEdit" name="carDisp">
+       <item row="2" column="2">
+        <widget class="QLineEdit" name="dateDisp">
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -707,16 +797,16 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <widget class="QLineEdit" name="dateDisp">
+       <item row="3" column="2">
+        <widget class="QLineEdit" name="carDisp">
          <property name="readOnly">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="8" column="2">
-        <widget class="QPlainTextEdit" name="descriptionDisp">
-         <property name="tabChangesFocus">
+       <item row="7" column="2">
+        <widget class="QLineEdit" name="testDisp">
+         <property name="enabled">
           <bool>true</bool>
          </property>
          <property name="readOnly">
@@ -724,83 +814,24 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
-        <widget class="QLineEdit" name="subsystemDisp">
+       <item row="7" column="0">
+        <widget class="QLabel" name="testLbl">
+         <property name="text">
+          <string>Test Plan</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="picLbl">
+         <property name="text">
+          <string>Testing Picture(s)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="2">
+        <widget class="QLineEdit" name="picDisp">
          <property name="readOnly">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QLineEdit" name="nameDisp">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="2">
-        <widget class="QLineEdit" name="fileDisp">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="subsystemLbl">
-         <property name="toolTip">
-          <string>What team subgroup is this for?</string>
-         </property>
-         <property name="text">
-          <string>Subsystem</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="descriptionLbl">
-         <property name="toolTip">
-          <string>What is this data?</string>
-         </property>
-         <property name="text">
-          <string>Description</string>
-         </property>
-         <property name="buddy">
-          <cstring>descriptionDisp</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="nameLbl">
-         <property name="toolTip">
-          <string>Name for the data</string>
-         </property>
-         <property name="text">
-          <string>Name</string>
-         </property>
-         <property name="buddy">
-          <cstring>nameDisp</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="dateLbl">
-         <property name="toolTip">
-          <string>When was this data collected?</string>
-         </property>
-         <property name="text">
-          <string>Date Collected</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="fileLbl">
-         <property name="toolTip">
-          <string>Attatch data file</string>
-         </property>
-         <property name="text">
-          <string>Data File(s)</string>
-         </property>
-         <property name="buddy">
-          <cstring>fileDisp</cstring>
          </property>
         </widget>
        </item>
